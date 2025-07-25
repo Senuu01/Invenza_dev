@@ -2,6 +2,58 @@
 
 @section('header', 'Admin Dashboard')
 
+<style>
+/* Admin Dashboard Card Improvements */
+.modern-card .card-body {
+    overflow: hidden;
+}
+
+.modern-card .flex-grow-1 {
+    min-width: 0;
+    overflow: hidden;
+}
+
+.modern-card .fw-bold.fs-3 {
+    font-size: 1.5rem !important;
+    line-height: 1.2;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+}
+
+.modern-card .text-muted.small {
+    font-size: 0.875rem;
+    line-height: 1.2;
+    margin-top: 0.25rem;
+}
+
+/* Ensure proper spacing for large numbers */
+.modern-card .d-flex.align-items-center {
+    gap: 0.75rem;
+}
+
+.modern-card .flex-shrink-0 {
+    flex-shrink: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .modern-card .fw-bold.fs-3 {
+        font-size: 1.25rem !important;
+    }
+    
+    .modern-card .text-muted.small {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .modern-card .fw-bold.fs-3 {
+        font-size: 1.1rem !important;
+    }
+}
+</style>
+
 @section('content')
 <div class="container-fluid px-2">
     @if (session('success'))
@@ -27,9 +79,9 @@
                                 <i class="fas fa-box text-white fs-4"></i>
                             </div>
                         </div>
-                        <div class="flex-grow-1 ms-3">
-                            <div class="fw-bold text-dark fs-3">{{ $totalProducts }}</div>
-                            <div class="text-muted">Total Products</div>
+                        <div class="flex-grow-1 ms-3 min-w-0">
+                            <div class="fw-bold text-dark fs-3 text-truncate" title="{{ $totalProducts }}">{{ $totalProducts }}</div>
+                            <div class="text-muted small">Total Products</div>
                         </div>
                     </div>
                 </div>
@@ -45,9 +97,9 @@
                                 <i class="fas fa-dollar-sign text-white fs-4"></i>
                             </div>
                         </div>
-                        <div class="flex-grow-1 ms-3">
-                            <div class="fw-bold text-dark fs-3">${{ number_format($totalValue, 2) }}</div>
-                            <div class="text-muted">Total Inventory Value</div>
+                        <div class="flex-grow-1 ms-3 min-w-0">
+                            <div class="fw-bold text-dark fs-3" title="${{ number_format($totalValue, 2) }}">{{ $formattedTotalValue }}</div>
+                            <div class="text-muted small">Total Inventory Value</div>
                         </div>
                     </div>
                 </div>
@@ -63,9 +115,9 @@
                                 <i class="fas fa-exclamation-triangle text-white fs-4"></i>
                             </div>
                         </div>
-                        <div class="flex-grow-1 ms-3">
-                            <div class="fw-bold text-dark fs-3">{{ $lowStockProducts }}</div>
-                            <div class="text-muted">Low Stock Items</div>
+                        <div class="flex-grow-1 ms-3 min-w-0">
+                            <div class="fw-bold text-dark fs-3 text-truncate" title="{{ $lowStockProducts }}">{{ $lowStockProducts }}</div>
+                            <div class="text-muted small">Low Stock Items</div>
                         </div>
                     </div>
                 </div>
@@ -81,9 +133,9 @@
                                 <i class="fas fa-chart-line text-white fs-4"></i>
                             </div>
                         </div>
-                        <div class="flex-grow-1 ms-3">
-                            <div class="fw-bold text-dark fs-3">{{ $recentProducts->count() }}</div>
-                            <div class="text-muted">Recent Products</div>
+                        <div class="flex-grow-1 ms-3 min-w-0">
+                            <div class="fw-bold text-dark fs-3 text-truncate" title="{{ $recentProducts->count() }}">{{ $recentProducts->count() }}</div>
+                            <div class="text-muted small">Recent Products</div>
                         </div>
                     </div>
                 </div>
