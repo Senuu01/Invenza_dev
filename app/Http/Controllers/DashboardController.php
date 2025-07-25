@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Models\Proposal;
 use App\Models\Invoice;
 use App\Models\CustomerActivity;
+use App\Helpers\NumberHelper;
 use Carbon\Carbon;
 
 class DashboardController extends Controller
@@ -119,7 +120,9 @@ class DashboardController extends Controller
                 'myStockUpdates',
                 'categoriesData',
                 'recentActivities'
-            ));
+            ))->with([
+                'formattedTotalValue' => NumberHelper::formatCurrency($totalValue)
+            ]);
         } elseif ($user->role === 'customer') {
             return redirect()->route('customer.dashboard');
         }
@@ -138,6 +141,53 @@ class DashboardController extends Controller
             'myStockUpdates',
             'categoriesData',
             'recentActivities'
-        ));
+        ))->with([
+            'formattedTotalValue' => NumberHelper::formatCurrency($totalValue)
+        ]);
+    }
+    
+    public function getChartData(Request $request)
+    {
+        $days = $request->get('days', 7);
+        $startDate = Carbon::now()->subDays($days);
+        
+        // Get categories with product counts for the specified period
+        $categories = Category::with(['products' => function($query) use ($startDate) {
+            $query->where('created_at', '>=', $startDate);
+        }])->get();
+        
+        $inventoryData = [
+            'labels' => $categories->pluck('name')->toArray(),
+            'inStock' => $categories->map(function($category) use ($startDate) {
+                return $category->products()
+                    ->where('status', 'in_stock')
+                    ->where('created_at', '>=', $startDate)
+                    ->count();
+            })->toArray(),
+            'lowStock' => $categories->map(function($category) use ($startDate) {
+                return $category->products()
+                    ->where('status', 'low_stock')
+                    ->where('created_at', '>=', $startDate)
+                    ->count();
+            })->toArray()
+        ];
+        
+        // Get stock status data for the specified period
+        $stockData = [
+            'inStock' => Product::where('status', 'in_stock')
+                ->where('created_at', '>=', $startDate)
+                ->count(),
+            'lowStock' => Product::where('status', 'low_stock')
+                ->where('created_at', '>=', $startDate)
+                ->count(),
+            'outOfStock' => Product::where('status', 'out_of_stock')
+                ->where('created_at', '>=', $startDate)
+                ->count()
+        ];
+        
+        return response()->json([
+            'inventory' => $inventoryData,
+            'stock' => $stockData
+        ]);
     }
 }
