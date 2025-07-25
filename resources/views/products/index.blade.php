@@ -288,6 +288,13 @@
                                                 </button>
                                             @endif
                                             
+                                            @if(auth()->user()->isStaff())
+                                                <button type="button" class="btn btn-sm btn-warning" title="Report Low Stock" 
+                                                        onclick="reportLowStock({{ $product->id }})">
+                                                    <i class="fas fa-exclamation-triangle"></i>
+                                                </button>
+                                            @endif
+                                            
                                             @if(auth()->user()->isAdmin())
                                                 <a href="{{ route('products.edit', $product) }}" class="btn btn-sm btn-outline-primary" title="Edit">
                                                     <i class="fas fa-edit"></i>
@@ -600,6 +607,31 @@ function showAlert(type, message) {
                 bsAlert.close();
             }
         }, 5000);
+    }
+}
+
+// Report low stock function
+function reportLowStock(productId) {
+    if (confirm('Are you sure you want to report this item as low stock to administrators?')) {
+        fetch(`/products/${productId}/report-low-stock`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAlert('success', 'Low stock report sent to administrators successfully!');
+            } else {
+                showAlert('error', data.message || 'Failed to report low stock');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlert('error', 'An error occurred while reporting low stock');
+        });
     }
 }
 </script>
