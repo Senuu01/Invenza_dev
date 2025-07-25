@@ -379,24 +379,6 @@
                             </a>
                         </div>
                         <div class="col-lg-3 col-md-6">
-                            <a href="{{ route('customers.create') }}" class="quick-action-card success">
-                                <div class="quick-action-content">
-                                    <i class="fas fa-user-plus quick-action-icon"></i>
-                                    <div class="quick-action-title">Add Customer</div>
-                                    <div class="quick-action-subtitle">New client</div>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="col-lg-3 col-md-6">
-                            <a href="{{ route('customers.index') }}" class="quick-action-card info">
-                                <div class="quick-action-content">
-                                    <i class="fas fa-users quick-action-icon"></i>
-                                    <div class="quick-action-title">View Customers</div>
-                                    <div class="quick-action-subtitle">Client management</div>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="col-lg-3 col-md-6">
                             <a href="{{ route('stock-requests.create') }}" class="quick-action-card warning new">
                                 <div class="quick-action-content">
                                     <i class="fas fa-truck-loading quick-action-icon"></i>
@@ -405,6 +387,16 @@
                                 </div>
                             </a>
                         </div>
+                        <div class="col-lg-3 col-md-6">
+                            <a href="{{ route('stock-requests.index') }}" class="quick-action-card info">
+                                <div class="quick-action-content">
+                                    <i class="fas fa-clipboard-list quick-action-icon"></i>
+                                    <div class="quick-action-title">My Requests</div>
+                                    <div class="quick-action-subtitle">Track orders</div>
+                                </div>
+                            </a>
+                        </div>
+
                         @else
                         <div class="col-lg-3 col-md-6">
                             <a href="{{ route('customer.products.index') }}" class="quick-action-card primary">
