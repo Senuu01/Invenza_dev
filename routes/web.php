@@ -81,6 +81,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('products', [ProductController::class, 'index'])->name('products.index');
         Route::get('products/{product}', [ProductController::class, 'show'])->name('products.show');
         Route::patch('products/{product}/stock', [ProductController::class, 'updateStock'])->name('products.update-stock');
+        Route::post('products/{product}/report-low-stock', [ProductController::class, 'reportLowStock'])->name('products.report-low-stock');
     });
     
     // Products admin-only routes
@@ -227,6 +228,10 @@ Route::middleware(['customer'])->group(function () {
         Route::get('products/search', [ProductController::class, 'search'])->name('products.search');
         Route::get('customers/search', [CustomerController::class, 'search'])->name('customers.search');
         Route::get('suppliers/search', [SupplierController::class, 'search'])->name('suppliers.search');
+        Route::get('featured-products', [ProductController::class, 'getFeaturedProducts'])->name('featured-products');
+        
+        // Dashboard chart data
+        Route::get('dashboard/chart-data', [DashboardController::class, 'getChartData'])->name('dashboard.chart-data');
         
         // Notification routes
         Route::get('notifications/recent', [NotificationController::class, 'getRecentNotifications'])->name('notifications.recent');
