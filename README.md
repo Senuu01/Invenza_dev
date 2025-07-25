@@ -1,58 +1,69 @@
-# Invenza - Inventory Management System
+# Invenza
 
 <p align="center">
     <img src="https://via.placeholder.com/400x100/3b82f6/ffffff?text=Invenza" alt="Invenza Logo" width="400">
 </p>
 
-<p align="center">
-    <strong>Modern Inventory Management System</strong><br>
-    Built with Laravel and Bootstrap
-</p>
+**Invenza** is a modern inventory management and e‑commerce platform built with Laravel. It offers tools for managing products, suppliers and customers while supporting full order processing with Stripe.
 
-## About Invenza
+## Features
 
-Invenza is a comprehensive inventory management system designed to streamline business operations. Built with Laravel framework, it provides a modern, user-friendly interface for managing products, suppliers, customers, and inventory.
+* Role‑based portals for **Admin**, **Staff** and **Customer**
+* Comprehensive product and stock management
+* Supplier and customer management
+* Invoice and proposal generation with PDF export
+* Real‑time dashboards and notifications
+* Shopping cart and checkout powered by Stripe
+* Optional store seeding with real product data
 
-### Key Features
+## Quick Start
 
-- **Multi-Role System**: Admin, Staff, and Customer portals
-- **Product Management**: Complete product lifecycle management
-- **Supplier Management**: Track and manage supplier relationships
-- **Customer Management**: Customer profiles and order history
-- **Stock Requests**: Automated stock request system
-- **Invoice & Proposal Management**: Generate and track business documents
-- **Real-time Dashboard**: Live statistics and analytics
-- **Modern UI**: Responsive design with futuristic animations
+1. Clone the repository and install PHP dependencies:
+   ```bash
+   composer install
+   ```
+2. Install Node dependencies and compile assets:
+   ```bash
+   npm install
+   npm run build # or npm run dev
+   ```
+3. Copy `.env.example` to `.env` and adjust your database credentials.
+4. Generate the application key:
+   ```bash
+   php artisan key:generate
+   ```
+5. Run migrations and seeders:
+   ```bash
+   php artisan migrate --seed
+   ```
+   To populate the store with sample data run:
+   ```bash
+   ./populate-store.sh
+   ```
+6. Start the development server:
+   ```bash
+   php artisan serve
+   ```
 
-### User Roles
+### Default Credentials
 
-- **Admin**: Full system access and management
-- **Staff**: Product and customer management
-- **Customer**: Product browsing and order placement
+* **Admin**: `admin@invenza.com` / `password`
+* **Staff**: `staff@invenza.com` / `password`
+* **Customer**: `customer@invenza.com` / `password`
 
-## Technology Stack
+## Development
 
-- **Backend**: Laravel 11 (PHP)
-- **Frontend**: Bootstrap 5, Tailwind CSS
-- **Database**: MySQL
-- **Icons**: Font Awesome 6
-- **Charts**: Chart.js
+* `composer dev` – run the web server, queue worker, log tail and Vite
+* `composer test` – run the test suite
 
-## Installation
+Add your Stripe keys and webhook secret to `.env`. See `STRIPE_SETUP.md` and `WEBHOOK_SETUP.md` for details.
 
-1. Clone the repository
-2. Install dependencies: `composer install`
-3. Copy `.env.example` to `.env` and configure
-4. Generate application key: `php artisan key:generate`
-5. Run migrations: `php artisan migrate`
-6. Seed the database: `php artisan db:seed`
-7. Start the server: `php artisan serve`
+Further documentation:
 
-## Default Credentials
-
-- **Admin**: admin@invenza.com / password
-- **Staff**: staff@invenza.com / password
-- **Customer**: customer@invenza.com / password
+* `DATABASE_INFO.md` – database schema and sample data
+* `STORE_POPULATION_GUIDE.md` – using real product APIs
+* `STRIPE_SETUP.md` – Stripe configuration
+* `WEBHOOK_SETUP.md` – webhook event guide
 
 ## License
 
