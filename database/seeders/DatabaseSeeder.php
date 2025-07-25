@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             StoreSeeder::class, // Add this line to populate with real data
             InvoiceSeeder::class,
             ProposalSeeder::class,
+            TestProductSeeder::class, // Add test products for Stripe testing
         ]);
     }
 }
