@@ -199,6 +199,330 @@
 </div>
 
 <style>
+/* Modern Hero Header */
+.hero-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    padding: 3rem 2rem;
+    margin: 0 -0.5rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+}
+
+.hero-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/><circle cx="10" cy="60" r="0.5" fill="white" opacity="0.1"/><circle cx="90" cy="40" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    opacity: 0.3;
+}
+
+.hero-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    z-index: 2;
+}
+
+.hero-text {
+    flex: 1;
+    max-width: 600px;
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 1rem;
+    line-height: 1.1;
+}
+
+.gradient-text {
+    background: linear-gradient(45deg, #ffd700, #ffed4e);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.hero-subtitle {
+    font-size: 1.25rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+.hero-stats {
+    display: flex;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-number {
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #ffd700;
+    line-height: 1;
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.8);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 0.25rem;
+}
+
+.hero-visual {
+    flex: 0 0 300px;
+    position: relative;
+    height: 200px;
+}
+
+.floating-elements {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.floating-icon {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+    animation: float 3s ease-in-out infinite;
+    animation-delay: var(--delay);
+}
+
+.floating-icon:nth-child(1) { top: 20%; left: 20%; }
+.floating-icon:nth-child(2) { top: 60%; right: 20%; }
+.floating-icon:nth-child(3) { bottom: 20%; left: 40%; }
+.floating-icon:nth-child(4) { top: 40%; right: 40%; }
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+
+/* Modern Search and Filters */
+.search-filters-section {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #f1f5f9;
+}
+
+.search-filters-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.search-section {
+    flex: 1;
+}
+
+.search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 0.5rem;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.search-input-wrapper:focus-within {
+    border-color: #3b82f6;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.search-icon {
+    color: #64748b;
+    font-size: 1.1rem;
+    margin-left: 1rem;
+    margin-right: 0.75rem;
+}
+
+.search-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: 1rem;
+    padding: 0.75rem 0;
+    outline: none;
+    color: #1e293b;
+}
+
+.search-input::placeholder {
+    color: #94a3b8;
+}
+
+.search-btn {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    color: white;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-right: 0.5rem;
+}
+
+.search-btn:hover {
+    background: linear-gradient(135deg, #1d4ed8, #1e40af);
+    transform: translateY(-1px);
+}
+
+.filters-section {
+    display: flex;
+    gap: 1rem;
+    align-items: end;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 150px;
+}
+
+.filter-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.25rem;
+}
+
+.filter-select {
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 0.75rem;
+    font-size: 0.875rem;
+    background: white;
+    color: #1e293b;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.filter-select:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    outline: none;
+}
+
+.clear-filters-btn {
+    background: #f1f5f9;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    color: #64748b;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.clear-filters-btn:hover {
+    background: #e2e8f0;
+    border-color: #cbd5e1;
+    color: #475569;
+}
+
+/* Pull-to-Refresh Styles */
+#pull-refresh-indicator {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+    padding: 1rem;
+    text-align: center;
+    transform: translateY(-100%);
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.pull-indicator-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    font-weight: 500;
+}
+
+.pull-indicator-content i {
+    font-size: 1.1rem;
+}
+
+.refresh-loading-spinner {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10000;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 2rem;
+    border-radius: 12px;
+    font-size: 2rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 2rem;
+    }
+    
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .hero-stats {
+        justify-content: center;
+        gap: 1.5rem;
+    }
+    
+    .filters-section {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .filter-group {
+        min-width: auto;
+    }
+    
+    .search-filters-section {
+        padding: 1.5rem;
+    }
+}
+
 /* Modern Online Store Styling */
 .card-gradient {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -625,8 +949,141 @@
 </style>
 
 <script>
+// Pull-to-refresh functionality
+let startY = 0;
+let currentY = 0;
+let pullDistance = 0;
+let isPulling = false;
+let refreshThreshold = 100;
+
+function initPullToRefresh() {
+    const body = document.body;
+    
+    body.addEventListener('touchstart', handleTouchStart, { passive: false });
+    body.addEventListener('touchmove', handleTouchMove, { passive: false });
+    body.addEventListener('touchend', handleTouchEnd, { passive: false });
+    
+    // Also support mouse events for desktop
+    body.addEventListener('mousedown', handleMouseStart, { passive: false });
+    body.addEventListener('mousemove', handleMouseMove, { passive: false });
+    body.addEventListener('mouseup', handleMouseEnd, { passive: false });
+}
+
+function handleTouchStart(e) {
+    if (window.scrollY === 0) {
+        startY = e.touches[0].clientY;
+        isPulling = true;
+    }
+}
+
+function handleTouchMove(e) {
+    if (!isPulling) return;
+    
+    currentY = e.touches[0].clientY;
+    pullDistance = currentY - startY;
+    
+    if (pullDistance > 0 && window.scrollY === 0) {
+        e.preventDefault();
+        showPullIndicator(pullDistance);
+    }
+}
+
+function handleTouchEnd(e) {
+    if (isPulling && pullDistance > refreshThreshold) {
+        performRefresh();
+    }
+    hidePullIndicator();
+    isPulling = false;
+    pullDistance = 0;
+}
+
+function handleMouseStart(e) {
+    if (window.scrollY === 0) {
+        startY = e.clientY;
+        isPulling = true;
+    }
+}
+
+function handleMouseMove(e) {
+    if (!isPulling) return;
+    
+    currentY = e.clientY;
+    pullDistance = currentY - startY;
+    
+    if (pullDistance > 0 && window.scrollY === 0) {
+        showPullIndicator(pullDistance);
+    }
+}
+
+function handleMouseEnd(e) {
+    if (isPulling && pullDistance > refreshThreshold) {
+        performRefresh();
+    }
+    hidePullIndicator();
+    isPulling = false;
+    pullDistance = 0;
+}
+
+function showPullIndicator(distance) {
+    let indicator = document.getElementById('pull-refresh-indicator');
+    if (!indicator) {
+        indicator = document.createElement('div');
+        indicator.id = 'pull-refresh-indicator';
+        indicator.innerHTML = `
+            <div class="pull-indicator-content">
+                <i class="fas fa-sync-alt ${distance > refreshThreshold ? 'fa-spin' : ''}"></i>
+                <span>${distance > refreshThreshold ? 'Release to refresh' : 'Pull to refresh'}</span>
+            </div>
+        `;
+        document.body.appendChild(indicator);
+    }
+    
+    const opacity = Math.min(distance / refreshThreshold, 1);
+    indicator.style.opacity = opacity;
+    indicator.style.transform = `translateY(${Math.min(distance * 0.5, 50)}px)`;
+    
+    if (distance > refreshThreshold) {
+        indicator.querySelector('i').classList.add('fa-spin');
+        indicator.querySelector('span').textContent = 'Release to refresh';
+    } else {
+        indicator.querySelector('i').classList.remove('fa-spin');
+        indicator.querySelector('span').textContent = 'Pull to refresh';
+    }
+}
+
+function hidePullIndicator() {
+    const indicator = document.getElementById('pull-refresh-indicator');
+    if (indicator) {
+        indicator.style.opacity = '0';
+        setTimeout(() => {
+            if (indicator.parentNode) {
+                indicator.parentNode.removeChild(indicator);
+            }
+        }, 300);
+    }
+}
+
+function performRefresh() {
+    // Show loading state
+    const productsGrid = document.getElementById('productsGrid');
+    productsGrid.style.opacity = '0.5';
+    productsGrid.style.pointerEvents = 'none';
+    
+    // Add loading spinner
+    const loadingSpinner = document.createElement('div');
+    loadingSpinner.className = 'refresh-loading-spinner';
+    loadingSpinner.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    document.body.appendChild(loadingSpinner);
+    
+    // Refresh the page
+    setTimeout(() => {
+        window.location.reload();
+    }, 500);
+}
+
+// Legacy refresh function for compatibility
 function refreshPage() {
-    window.location.reload();
+    performRefresh();
 }
 
 function filterProducts() {
@@ -695,6 +1152,9 @@ function clearFilters() {
 
 // Initialize filters on page load
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize pull-to-refresh functionality
+    initPullToRefresh();
+    
     // Add some delay to the animation for better visual effect
     const productCards = document.querySelectorAll('.product-card');
     productCards.forEach((card, index) => {
