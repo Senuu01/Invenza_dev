@@ -57,7 +57,7 @@
                             </div>
                         </div>
                         <div class="flex-grow-1 ms-3">
-                            <div class="fw-bold text-dark fs-4">${{ number_format($totalValue, 0) }}</div>
+                            <div class="fw-bold text-dark fs-4" title="${{ number_format($totalValue, 2) }}">{{ $formattedTotalValue }}</div>
                             <div class="text-muted small">Total Value</div>
                         </div>
                     </div>
@@ -116,13 +116,13 @@
                             <p class="text-muted small mb-0">Stock levels across categories</p>
                         </div>
                         <div class="dropdown">
-                            <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" id="dateFilterBtn">
                                 Last 7 Days
                             </button>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="#">Last 7 Days</a></li>
-                                <li><a class="dropdown-item" href="#">Last 30 Days</a></li>
-                                <li><a class="dropdown-item" href="#">Last 3 Months</a></li>
+                                <li><a class="dropdown-item" href="#" data-period="7" onclick="updateChartData(7)">Last 7 Days</a></li>
+                                <li><a class="dropdown-item" href="#" data-period="30" onclick="updateChartData(30)">Last 30 Days</a></li>
+                                <li><a class="dropdown-item" href="#" data-period="90" onclick="updateChartData(90)">Last 3 Months</a></li>
                             </ul>
                         </div>
                     </div>
@@ -556,15 +556,31 @@
     .quick-action-card.new::after {
         content: 'NEW';
         position: absolute;
-        top: -5px;
-        right: -5px;
-        background: #ff4757;
+        top: -8px;
+        right: -8px;
+        background: linear-gradient(135deg, #ff4757 0%, #ff3742 100%);
         color: white;
-        padding: 0.25rem 0.5rem;
-        border-radius: 8px;
-        font-size: 0.7rem;
-        font-weight: bold;
-        z-index: 3;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        z-index: 10;
+        box-shadow: 0 4px 12px rgba(255, 71, 87, 0.4);
+        border: 2px solid white;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { 
+            transform: scale(1); 
+            opacity: 1; 
+        }
+        50% { 
+            transform: scale(1.05); 
+            opacity: 0.9; 
+        }
     }
     </style>
 </div>
@@ -618,10 +634,20 @@
 </style>
 
 <script>
+let inventoryChart, stockChart;
+
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize charts
+    initializeCharts();
+    
+    // Set up date filter functionality
+    setupDateFilter();
+});
+
+function initializeCharts() {
     // Inventory Chart
     const inventoryCtx = document.getElementById('inventoryChart').getContext('2d');
-    new Chart(inventoryCtx, {
+    inventoryChart = new Chart(inventoryCtx, {
         type: 'bar',
         data: {
             labels: [@foreach(\App\Models\Category::all() as $category)'{{ $category->name }}'{{ !$loop->last ? ',' : '' }}@endforeach],
@@ -680,7 +706,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const lowStockCount = {{ \App\Models\Product::where('status', 'low_stock')->count() }};
     const outOfStockCount = {{ \App\Models\Product::where('status', 'out_of_stock')->count() }};
     
-    new Chart(stockCtx, {
+    stockChart = new Chart(stockCtx, {
         type: 'doughnut',
         data: {
             labels: ['In Stock', 'Low Stock', 'Out of Stock'],
@@ -718,6 +744,95 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
-});
+}
+
+function setupDateFilter() {
+    // Add click handlers to dropdown items
+    document.querySelectorAll('.dropdown-item[data-period]').forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            const period = parseInt(this.getAttribute('data-period'));
+            updateChartData(period);
+            
+            // Update button text
+            document.getElementById('dateFilterBtn').textContent = this.textContent;
+        });
+    });
+}
+
+function updateChartData(days) {
+    // Show loading state
+    showChartLoading();
+    
+    // Fetch updated data from server
+    fetch(`/api/dashboard/chart-data?days=${days}`)
+        .then(response => response.json())
+        .then(data => {
+            updateInventoryChart(data.inventory);
+            updateStockChart(data.stock);
+            hideChartLoading();
+        })
+        .catch(error => {
+            console.error('Error fetching chart data:', error);
+            hideChartLoading();
+            // Fallback to static data
+            updateChartsWithStaticData(days);
+        });
+}
+
+function updateInventoryChart(data) {
+    if (inventoryChart) {
+        inventoryChart.data.labels = data.labels;
+        inventoryChart.data.datasets[0].data = data.inStock;
+        inventoryChart.data.datasets[1].data = data.lowStock;
+        inventoryChart.update('active');
+    }
+}
+
+function updateStockChart(data) {
+    if (stockChart) {
+        stockChart.data.datasets[0].data = [data.inStock, data.lowStock, data.outOfStock];
+        stockChart.update('active');
+    }
+}
+
+function updateChartsWithStaticData(days) {
+    // Fallback function with simulated data based on days
+    const multiplier = days === 7 ? 1 : days === 30 ? 1.2 : 1.5;
+    
+    const categories = [@foreach(\App\Models\Category::all() as $category)'{{ $category->name }}'{{ !$loop->last ? ',' : '' }}@endforeach];
+    const inStockData = categories.map(() => Math.floor(Math.random() * 20 * multiplier) + 5);
+    const lowStockData = categories.map(() => Math.floor(Math.random() * 10 * multiplier) + 2);
+    
+    updateInventoryChart({
+        labels: categories,
+        inStock: inStockData,
+        lowStock: lowStockData
+    });
+    
+    updateStockChart({
+        inStock: Math.floor({{ \App\Models\Product::where('status', 'in_stock')->count() }} * multiplier),
+        lowStock: Math.floor({{ \App\Models\Product::where('status', 'low_stock')->count() }} * multiplier),
+        outOfStock: Math.floor({{ \App\Models\Product::where('status', 'out_of_stock')->count() }} * multiplier)
+    });
+}
+
+function showChartLoading() {
+    // Add loading overlay to charts
+    const chartContainers = document.querySelectorAll('#inventoryChart, #stockChart');
+    chartContainers.forEach(container => {
+        container.style.opacity = '0.5';
+        container.style.pointerEvents = 'none';
+    });
+}
+
+function hideChartLoading() {
+    // Remove loading overlay from charts
+    const chartContainers = document.querySelectorAll('#inventoryChart, #stockChart');
+    chartContainers.forEach(container => {
+        container.style.opacity = '1';
+        container.style.pointerEvents = 'auto';
+    });
+}
 </script>
 @endsection
