@@ -33,17 +33,35 @@
                                             <div class="d-flex justify-content-between align-items-start">
                                                 <div>
                                                     <h6 class="mb-1 {{ $notification->read_at ? 'text-muted' : 'fw-bold' }}">
-                                                        {{ $notification->data['message'] ?? 'Stock Update' }}
+                                                        {{ $notification->data['message'] ?? 'Notification' }}
                                                     </h6>
-                                                    <p class="mb-1 text-muted">
-                                                        Stock for <strong>{{ $notification->data['product_name'] }}</strong> 
-                                                        updated from <strong>{{ $notification->data['old_quantity'] }}</strong> 
-                                                        to <strong>{{ $notification->data['new_quantity'] }}</strong>
-                                                    </p>
-                                                    <small class="text-muted">
-                                                        Updated by {{ $notification->data['staff_user_name'] }} • 
-                                                        {{ $notification->created_at->diffForHumans() }}
-                                                    </small>
+                                                    @if($notification->data['type'] === 'stock_update')
+                                                        <p class="mb-1 text-muted">
+                                                            Stock for <strong>{{ $notification->data['product_name'] ?? 'Unknown Product' }}</strong> 
+                                                            updated from <strong>{{ $notification->data['old_quantity'] ?? 'N/A' }}</strong> 
+                                                            to <strong>{{ $notification->data['new_quantity'] ?? 'N/A' }}</strong>
+                                                        </p>
+                                                        <small class="text-muted">
+                                                            Updated by {{ $notification->data['staff_user_name'] ?? 'Unknown User' }} • 
+                                                            {{ $notification->created_at->diffForHumans() }}
+                                                        </small>
+                                                    @elseif(str_starts_with($notification->data['type'] ?? '', 'stock_request'))
+                                                        <p class="mb-1 text-muted">
+                                                            <strong>{{ $notification->data['product_name'] ?? 'Unknown Product' }}</strong> • 
+                                                            Quantity: {{ $notification->data['quantity_requested'] ?? 'N/A' }}
+                                                        </p>
+                                                        <small class="text-muted">
+                                                            {{ $notification->data['requester_name'] ?? 'Unknown User' }} • 
+                                                            {{ $notification->created_at->diffForHumans() }}
+                                                        </small>
+                                                    @else
+                                                        <p class="mb-1 text-muted">
+                                                            {{ $notification->data['message'] ?? 'Notification details not available' }}
+                                                        </p>
+                                                        <small class="text-muted">
+                                                            {{ $notification->created_at->diffForHumans() }}
+                                                        </small>
+                                                    @endif
                                                 </div>
                                                 <div class="ms-3">
                                                     @if(!$notification->read_at)
