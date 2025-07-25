@@ -12,8 +12,10 @@ class CustomerDashboardController extends Controller
         $products = Product::with('category')
             ->where('quantity', '>', 0)
             ->paginate(12);
+        
+        $categories = \App\Models\Category::all();
 
-        return view('customer.dashboard', compact('products'));
+        return view('customer.dashboard', compact('products', 'categories'));
     }
 
     public function show(Product $product)
