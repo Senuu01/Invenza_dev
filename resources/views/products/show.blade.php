@@ -187,10 +187,20 @@
                         </div>
                         <div class="card-body p-4">
                             <div class="d-grid gap-3">
-                                <a href="{{ route('products.edit', $product) }}" class="btn btn-primary-modern btn-lg">
-                                    <i class="fas fa-edit me-2"></i>
-                                    Edit Product
-                                </a>
+                                @if(auth()->user()->isAdmin())
+                                    <a href="{{ route('products.edit', $product) }}" class="btn btn-primary-modern btn-lg">
+                                        <i class="fas fa-edit me-2"></i>
+                                        Edit Product
+                                    </a>
+                                @endif
+                                
+                                @if(auth()->user()->isStaff())
+                                    <button class="btn btn-warning btn-lg" onclick="reportLowStock({{ $product->id }})">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                        Report Low Stock
+                                    </button>
+                                @endif
+                                
                                 <button class="btn btn-outline-success btn-lg" onclick="printProduct()">
                                     <i class="fas fa-print me-2"></i>
                                     Print Details
@@ -199,15 +209,18 @@
                                     <i class="fas fa-share me-2"></i>
                                     Share Product
                                 </button>
-                                <form action="{{ route('products.destroy', $product) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-outline-danger btn-lg w-100" 
-                                            onclick="return confirm('Are you sure you want to delete this product?')">
-                                        <i class="fas fa-trash me-2"></i>
-                                        Delete Product
-                                    </button>
-                                </form>
+                                
+                                @if(auth()->user()->isAdmin())
+                                    <form action="{{ route('products.destroy', $product) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-outline-danger btn-lg w-100" 
+                                                onclick="return confirm('Are you sure you want to delete this product?')">
+                                            <i class="fas fa-trash me-2"></i>
+                                            Delete Product
+                                        </button>
+                                    </form>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -466,6 +479,30 @@ function shareProduct() {
         // Fallback: copy URL to clipboard
         navigator.clipboard.writeText(window.location.href).then(() => {
             alert('Product URL copied to clipboard!');
+        });
+    }
+}
+
+function reportLowStock(productId) {
+    if (confirm('Are you sure you want to report this item as low stock to administrators?')) {
+        fetch(`/products/${productId}/report-low-stock`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Low stock report sent to administrators successfully!');
+            } else {
+                alert('Error: ' + (data.message || 'Failed to report low stock'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while reporting low stock');
         });
     }
 }
