@@ -34,7 +34,7 @@ class RegisteredUserController extends Controller
                 'name' => ['required', 'string', 'max:255', 'min:2'],
                 'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
                 'password' => ['required', 'confirmed', Rules\Password::defaults()],
-                'role' => ['required', 'in:admin,customer'],
+                'role' => ['required', 'in:admin,staff,customer'],
             ], [
                 'name.required' => 'Full name is required.',
                 'name.min' => 'Full name must be at least 2 characters.',

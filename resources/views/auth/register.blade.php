@@ -425,7 +425,7 @@
         /* Role Selection */
         .role-cards {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 12px;
             margin-top: 8px;
         }
@@ -475,6 +475,10 @@
             background: linear-gradient(135deg, #3b82f6, #60a5fa);
         }
         
+        .role-card.customer .role-icon {
+            background: linear-gradient(135deg, #10b981, #34d399);
+        }
+        
         .role-title {
             font-size: 14px;
             font-weight: 600;
@@ -516,6 +520,7 @@
             
             .role-cards {
                 grid-template-columns: 1fr;
+                gap: 8px;
             }
             
             .form-input, .form-select {
@@ -683,6 +688,14 @@
                             </div>
                             <div class="role-title">Staff Member</div>
                             <div class="role-desc">Standard access</div>
+                        </div>
+                        <div class="role-card customer" onclick="selectRole('customer', this)">
+                            <input type="radio" name="role" value="customer">
+                            <div class="role-icon">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <div class="role-title">Customer</div>
+                            <div class="role-desc">Browse & purchase</div>
                         </div>
                     </div>
                     @error('role')

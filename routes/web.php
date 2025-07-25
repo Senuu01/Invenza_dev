@@ -17,6 +17,10 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\StockRequestController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\StripeController;
 
 // Root redirect
 Route::get('/', function () {
@@ -109,56 +113,57 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
     });
     
-    // Customers - Staff can view and update, Admin can manage
-    Route::middleware(['staff'])->group(function () {
-        Route::resource('customers', CustomerController::class)->except(['destroy'])->missing(function (Request $request) {
+    // Customers - Admin only
+    Route::middleware(['admin'])->group(function () {
+        Route::resource('customers', CustomerController::class)->missing(function (Request $request) {
             return redirect()->route('customers.index')->withErrors(['error' => 'Customer not found.']);
         });
     });
     
+    // CRM & Sales routes - Admin only
     Route::middleware(['admin'])->group(function () {
-        Route::delete('customers/{customer}', [CustomerController::class, 'destroy'])->name('customers.destroy');
-    });
-    
-    // CRM & Sales routes with error handling
-    Route::resource('proposals', ProposalController::class)->missing(function (Request $request) {
-        return redirect()->route('proposals.index')->withErrors(['error' => 'Proposal not found.']);
-    });
-    
-    Route::resource('invoices', InvoiceController::class)->missing(function (Request $request) {
-        return redirect()->route('invoices.index')->withErrors(['error' => 'Invoice not found.']);
-    });
-    
-    Route::resource('customer-notes', CustomerNoteController::class)
-        ->except(['index', 'show'])
-        ->missing(function (Request $request) {
-            return redirect()->back()->withErrors(['error' => 'Customer note not found.']);
+        Route::resource('proposals', ProposalController::class)->missing(function (Request $request) {
+            return redirect()->route('proposals.index')->withErrors(['error' => 'Proposal not found.']);
         });
+        
+        Route::resource('invoices', InvoiceController::class)->missing(function (Request $request) {
+            return redirect()->route('invoices.index')->withErrors(['error' => 'Invoice not found.']);
+        });
+    });
     
-    // Enhanced Proposal specific routes with error handling
-    Route::prefix('proposals/{proposal}')->name('proposals.')->group(function () {
-        Route::post('send', [ProposalController::class, 'send'])->name('send');
-        Route::post('accept', [ProposalController::class, 'accept'])->name('accept');
-        Route::post('reject', [ProposalController::class, 'reject'])->name('reject');
-        Route::post('duplicate', [ProposalController::class, 'duplicate'])->name('duplicate');
-        Route::get('pdf', [ProposalController::class, 'exportPdf'])->name('pdf');
-        Route::get('convert-to-invoice', [ProposalController::class, 'convertToInvoice'])->name('convert-to-invoice');
-    })->where('proposal', '[0-9]+');
-    
-    // Enhanced Invoice specific routes with error handling  
-    Route::prefix('invoices/{invoice}')->name('invoices.')->group(function () {
-        Route::post('send', [InvoiceController::class, 'send'])->name('send');
-        Route::post('mark-paid', [InvoiceController::class, 'markPaid'])->name('mark-paid');
-        Route::post('duplicate', [InvoiceController::class, 'duplicate'])->name('duplicate');
-        Route::get('pdf', [InvoiceController::class, 'exportPdf'])->name('pdf');
-    })->where('invoice', '[0-9]+');
-    
-    // Customer notes nested routes
-    Route::prefix('customers/{customer}')->name('customers.')->group(function () {
-        Route::get('notes', [CustomerNoteController::class, 'index'])->name('notes.index');
-        Route::post('notes', [CustomerNoteController::class, 'store'])->name('notes.store');
-        Route::get('product/{product}', [CustomerController::class, 'showProduct'])->name('product.show');
-    })->where(['customer' => '[0-9]+', 'product' => '[0-9]+']);
+    // Enhanced Proposal specific routes with error handling - Admin only
+    Route::middleware(['admin'])->group(function () {
+        Route::prefix('proposals/{proposal}')->name('proposals.')->group(function () {
+            Route::post('send', [ProposalController::class, 'send'])->name('send');
+            Route::post('accept', [ProposalController::class, 'accept'])->name('accept');
+            Route::post('reject', [ProposalController::class, 'reject'])->name('reject');
+            Route::post('duplicate', [ProposalController::class, 'duplicate'])->name('duplicate');
+            Route::get('pdf', [ProposalController::class, 'exportPdf'])->name('pdf');
+            Route::get('convert-to-invoice', [ProposalController::class, 'convertToInvoice'])->name('convert-to-invoice');
+        })->where('proposal', '[0-9]+');
+        
+        // Enhanced Invoice specific routes with error handling  
+        Route::prefix('invoices/{invoice}')->name('invoices.')->group(function () {
+            Route::post('send', [InvoiceController::class, 'send'])->name('send');
+            Route::post('mark-paid', [InvoiceController::class, 'markPaid'])->name('mark-paid');
+            Route::post('duplicate', [InvoiceController::class, 'duplicate'])->name('duplicate');
+            Route::get('pdf', [InvoiceController::class, 'exportPdf'])->name('pdf');
+        })->where('invoice', '[0-9]+');
+        
+        // Customer notes - Admin only
+        Route::resource('customer-notes', CustomerNoteController::class)
+            ->except(['index', 'show'])
+            ->missing(function (Request $request) {
+                return redirect()->back()->withErrors(['error' => 'Customer note not found.']);
+            });
+        
+        // Customer notes nested routes
+        Route::prefix('customers/{customer}')->name('customers.')->group(function () {
+            Route::get('notes', [CustomerNoteController::class, 'index'])->name('notes.index');
+            Route::post('notes', [CustomerNoteController::class, 'store'])->name('notes.store');
+            Route::get('product/{product}', [CustomerController::class, 'showProduct'])->name('product.show');
+        })->where(['customer' => '[0-9]+', 'product' => '[0-9]+']);
+    });
     
     // Admin routes with enhanced security
     Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function () {
@@ -188,6 +193,34 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('orders', [CustomerController::class, 'orders'])->name('orders.index');
         Route::get('profile', [CustomerController::class, 'profile'])->name('profile.show');
     });
+    
+    // E-commerce routes for customers
+Route::middleware(['customer'])->group(function () {
+    // Shopping Cart
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::get('/cart/items', [CartController::class, 'getCartItems'])->name('cart.items');
+    Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
+    Route::put('/cart/update/{cartItem}', [CartController::class, 'update'])->name('cart.update');
+    Route::delete('/cart/remove/{cartItem}', [CartController::class, 'remove'])->name('cart.remove');
+    Route::delete('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+    Route::get('/cart/count', [CartController::class, 'getCartCount'])->name('cart.count');
+    
+    // Checkout
+    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+    Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+    
+    // Orders
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+    Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+    Route::get('/orders/{order}/track', [OrderController::class, 'track'])->name('orders.track');
+    
+    // Stripe Checkout
+    Route::post('/stripe/create-checkout-session', [StripeController::class, 'createCheckoutSession'])->name('stripe.create-checkout-session');
+    Route::get('/stripe/success', [StripeController::class, 'success'])->name('stripe.success');
+    Route::get('/stripe/cancel', [StripeController::class, 'cancel'])->name('stripe.cancel');
+    Route::post('/stripe/webhook', [StripeController::class, 'webhook'])->name('stripe.webhook');
+});
     
     // API routes for AJAX requests
     Route::prefix('api')->name('api.')->group(function () {

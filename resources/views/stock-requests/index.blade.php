@@ -1,24 +1,150 @@
 @extends('layouts.app')
 
-@section('header', 'Stock Requests')
+@section('header', 'Stock Requests Management')
 
 @section('content')
 <div class="container-fluid px-2">
-    <div class="row mb-4">
+    <!-- Page Header -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="modern-card card-gradient animate-fade-in">
+                <div class="card-body px-4 py-3">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <h4 class="mb-1 fw-bold text-dark">
+                                <i class="fas fa-truck-loading text-primary me-2"></i>
+                                Stock Requests Management
+                            </h4>
+                            <p class="text-muted mb-0">
+                                @if(auth()->user()->isStaff())
+                                    Request new stock from suppliers
+                                @else
+                                    Manage and approve stock requests from staff
+                                @endif
+                            </p>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button onclick="refreshPage()" class="btn btn-outline-modern">
+                                <i class="fas fa-sync-alt me-2"></i>
+                                Refresh
+                            </button>
+                            @if(auth()->user()->isStaff())
+                            <a href="{{ route('stock-requests.create') }}" class="btn btn-primary-modern">
+                                <i class="fas fa-plus me-2"></i>
+                                New Stock Request
+                            </a>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success/Error Messages -->
+    @if(session('success'))
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="alert alert-success alert-dismissible fade show modern-card" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="alert alert-danger alert-dismissible fade show modern-card" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    {{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Statistics Cards -->
+    <div class="row mb-3">
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="modern-card animate-fade-in animate-delay-1">
+                <div class="card-body p-3">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="rounded-3 p-3" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">
+                                <i class="fas fa-clipboard-list text-white fs-5"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <div class="fw-bold text-dark fs-4">{{ $stockRequests->total() }}</div>
+                            <div class="text-muted small">Total Requests</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="modern-card animate-fade-in animate-delay-2">
+                <div class="card-body p-3">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="rounded-3 p-3" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                                <i class="fas fa-clock text-white fs-5"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <div class="fw-bold text-dark fs-4">{{ \App\Models\StockRequest::where('status', 'pending')->count() }}</div>
+                            <div class="text-muted small">Pending</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="modern-card animate-fade-in animate-delay-3">
+                <div class="card-body p-3">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="rounded-3 p-3" style="background: linear-gradient(135deg, #10b981, #059669);">
+                                <i class="fas fa-check-circle text-white fs-5"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <div class="fw-bold text-dark fs-4">{{ \App\Models\StockRequest::where('status', 'approved')->count() }}</div>
+                            <div class="text-muted small">Approved</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="modern-card animate-fade-in animate-delay-4">
+                <div class="card-body p-3">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="rounded-3 p-3" style="background: linear-gradient(135deg, #ef4444, #dc2626);">
+                                <i class="fas fa-times-circle text-white fs-5"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <div class="fw-bold text-dark fs-4">{{ \App\Models\StockRequest::where('status', 'rejected')->count() }}</div>
+                            <div class="text-muted small">Rejected</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="row">
         <div class="col-12">
             <div class="modern-card animate-fade-in">
-                <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
-                    <h6 class="mb-0 fw-bold text-dark">
-                        <i class="fas fa-truck-loading text-primary me-2"></i>
-                        Stock Requests Management
-                    </h6>
-                    @if(auth()->user()->isStaff())
-                    <a href="{{ route('stock-requests.create') }}" class="btn btn-primary-modern">
-                        <i class="fas fa-plus me-2"></i>
-                        New Stock Request
-                    </a>
-                    @endif
-                </div>
                 <div class="card-body p-4">
                     <!-- Filters -->
                     <div class="row mb-4">
@@ -174,20 +300,33 @@
                         @else
                             <div class="text-center py-5">
                                 <div class="empty-state">
-                                    <i class="fas fa-clipboard-list text-muted mb-3"></i>
-                                    <h5 class="text-muted mb-2">No stock requests found</h5>
-                                    <p class="text-muted mb-4">
+                                    <div class="empty-state-icon mb-4">
+                                        <div class="icon-circle">
+                                            <i class="fas fa-truck-loading"></i>
+                                        </div>
+                                    </div>
+                                    <h4 class="fw-bold text-dark mb-3">No Stock Requests Found</h4>
+                                    <p class="text-muted mb-4 fs-5">
                                         @if(auth()->user()->isStaff())
-                                            Create your first stock request to get started.
+                                            Ready to request new stock? Start by creating your first stock request.
                                         @else
-                                            Staff members will create stock requests here.
+                                            Staff members will create stock requests here for your approval.
                                         @endif
                                     </p>
                                     @if(auth()->user()->isStaff())
-                                        <a href="{{ route('stock-requests.create') }}" class="btn btn-primary-modern">
-                                            <i class="fas fa-plus me-2"></i>
-                                            Create Stock Request
-                                        </a>
+                                        <div class="d-flex justify-content-center">
+                                            <a href="{{ route('stock-requests.create') }}" class="btn btn-create-request">
+                                                <div class="btn-content">
+                                                    <div class="btn-icon">
+                                                        <i class="fas fa-plus"></i>
+                                                    </div>
+                                                    <div class="btn-text">
+                                                        <span class="btn-title">Create Stock Request</span>
+                                                        <span class="btn-subtitle">Request new inventory</span>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </div>
                                     @endif
                                 </div>
                             </div>
@@ -200,27 +339,63 @@
 </div>
 
 <!-- Approval Modal -->
-<div class="modal fade" id="approvalModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content modern-modal">
-            <div class="modal-header border-0">
-                <h5 class="modal-title fw-bold text-dark" id="modalTitle">Approve Stock Request</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+<div class="modal fade" id="approvalModal" tabindex="-1" aria-labelledby="approvalModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content modern-card">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" id="approvalModalLabel">
+                    <i class="fas fa-check-circle text-success me-2"></i>
+                    Approve Stock Request
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="approvalForm">
+            <form id="approvalForm" method="POST">
+                @csrf
                 <div class="modal-body">
-                    <input type="hidden" id="requestId" name="request_id">
-                    <input type="hidden" id="actionType" name="action_type">
-                    
+                    <p class="mb-3">Are you sure you want to approve this stock request?</p>
                     <div class="mb-3">
-                        <label class="form-label fw-semibold text-dark">Notes (Optional)</label>
-                        <textarea class="form-control modern-textarea" id="adminNotes" name="admin_notes" rows="3" 
-                                  placeholder="Add any notes about this decision..."></textarea>
+                        <label for="admin_notes" class="form-label fw-semibold">Admin Notes (Optional)</label>
+                        <textarea class="form-control modern-textarea" id="admin_notes" name="admin_notes" rows="3" placeholder="Add any notes for the requester..."></textarea>
                     </div>
                 </div>
-                <div class="modal-footer border-0">
+                <div class="modal-footer border-0 pt-0">
                     <button type="button" class="btn btn-outline-modern" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary-modern" id="submitBtn">Submit</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-check me-2"></i>
+                        Approve Request
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Rejection Modal -->
+<div class="modal fade" id="rejectionModal" tabindex="-1" aria-labelledby="rejectionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content modern-card">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-danger" id="rejectionModalLabel">
+                    <i class="fas fa-times-circle me-2"></i>
+                    Reject Stock Request
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="rejectionForm" method="POST">
+                @csrf
+                <div class="modal-body">
+                    <p class="mb-3">Are you sure you want to reject this stock request?</p>
+                    <div class="mb-3">
+                        <label for="rejection_notes" class="form-label fw-semibold">Rejection Reason <span class="text-danger">*</span></label>
+                        <textarea class="form-control modern-textarea" id="rejection_notes" name="admin_notes" rows="3" placeholder="Please provide a reason for rejection..." required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-outline-modern" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-times me-2"></i>
+                        Reject Request
+                    </button>
                 </div>
             </form>
         </div>
@@ -229,271 +404,218 @@
 
 <style>
 /* Modern styling for stock requests page */
+.card-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.card-gradient h4,
+.card-gradient p {
+    color: white !important;
+}
+
 .modern-select {
-    border: 1px solid #e9ecef;
-    border-radius: 8px;
-    padding: 0.75rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 14px;
     transition: all 0.3s ease;
-    background-color: #fff;
+    background: white;
 }
 
 .modern-select:focus {
     border-color: #3b82f6;
-    box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    transform: translateY(-1px);
 }
 
 .modern-textarea {
-    border: 1px solid #e9ecef;
-    border-radius: 8px;
-    padding: 0.75rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 14px;
     transition: all 0.3s ease;
     resize: vertical;
 }
 
 .modern-textarea:focus {
     border-color: #3b82f6;
-    box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
-}
-
-.modern-modal .modal-content {
-    border: none;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    transform: translateY(-1px);
 }
 
 .table-row-hover:hover {
-    background-color: #f8f9fa;
+    background-color: rgba(59, 130, 246, 0.05);
     transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.product-icon, .supplier-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(59, 130, 246, 0.1);
-}
-
-.supplier-icon {
-    background: rgba(34, 197, 94, 0.1);
+    transition: all 0.3s ease;
 }
 
 .user-avatar {
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     background: linear-gradient(135deg, #3b82f6, #1d4ed8);
     color: white;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.75rem;
-    font-weight: bold;
-}
-
-.empty-state i {
-    font-size: 4rem;
-    opacity: 0.5;
-}
-
-.btn-group .btn {
-    margin-right: 2px;
-    border-radius: 6px;
-}
-
-.btn-group .btn:last-child {
-    margin-right: 0;
-}
-
-/* Status badge styling */
-.badge {
-    padding: 0.5em 0.75em;
-    font-size: 0.75rem;
     font-weight: 600;
-    border-radius: 6px;
+    font-size: 12px;
 }
 
-.badge.bg-warning {
-    background-color: #fbbf24 !important;
-    color: #92400e !important;
-}
-
-.badge.bg-success {
-    background-color: #34d399 !important;
-    color: #065f46 !important;
-}
-
-.badge.bg-danger {
-    background-color: #f87171 !important;
-    color: #991b1b !important;
-}
-
-.badge.bg-info {
-    background-color: #60a5fa !important;
-    color: #1e40af !important;
-}
-
-/* Animation for table rows */
-.table tbody tr {
-    transition: all 0.3s ease;
-}
-
-/* Responsive improvements */
-@media (max-width: 768px) {
-    .btn-group {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-    }
-    
-    .btn-group .btn {
-        margin-right: 0;
-        margin-bottom: 2px;
-    }
-    
-    .table-responsive {
-        font-size: 0.875rem;
-    }
-}
-</style>
-
-<style>
-/* Modern styling for stock requests page */
-.modern-select {
-    border: 1px solid #e9ecef;
-    border-radius: 8px;
-    padding: 0.75rem;
-    transition: all 0.3s ease;
-    background-color: #fff;
-}
-
-.modern-select:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
-}
-
-.modern-textarea {
-    border: 1px solid #e9ecef;
-    border-radius: 8px;
-    padding: 0.75rem;
-    transition: all 0.3s ease;
-    resize: vertical;
-}
-
-.modern-textarea:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
-}
-
-.modern-modal .modal-content {
-    border: none;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-}
-
-.table-row-hover:hover {
-    background-color: #f8f9fa;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.product-icon, .supplier-icon {
+.product-icon,
+.supplier-icon {
     width: 32px;
     height: 32px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    border-radius: 8px;
     background: rgba(59, 130, 246, 0.1);
-}
-
-.supplier-icon {
-    background: rgba(34, 197, 94, 0.1);
-}
-
-.user-avatar {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-    color: white;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.75rem;
-    font-weight: bold;
 }
 
-.empty-state i {
-    font-size: 4rem;
-    opacity: 0.5;
+.empty-state {
+    padding: 60px 20px;
+    max-width: 500px;
+    margin: 0 auto;
 }
 
-.btn-group .btn {
-    margin-right: 2px;
-    border-radius: 6px;
+.empty-state-icon {
+    margin-bottom: 2rem;
 }
 
-.btn-group .btn:last-child {
-    margin-right: 0;
-}
-
-/* Status badge styling */
-.badge {
-    padding: 0.5em 0.75em;
-    font-size: 0.75rem;
-    font-weight: 600;
-    border-radius: 6px;
-}
-
-.badge.bg-warning {
-    background-color: #fbbf24 !important;
-    color: #92400e !important;
-}
-
-.badge.bg-success {
-    background-color: #34d399 !important;
-    color: #065f46 !important;
-}
-
-.badge.bg-danger {
-    background-color: #f87171 !important;
-    color: #991b1b !important;
-}
-
-.badge.bg-info {
-    background-color: #60a5fa !important;
-    color: #1e40af !important;
-}
-
-/* Animation for table rows */
-.table tbody tr {
+.icon-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
     transition: all 0.3s ease;
 }
 
-/* Responsive improvements */
-@media (max-width: 768px) {
-    .btn-group {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
+.icon-circle:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+}
+
+.icon-circle i {
+    font-size: 48px;
+    color: white;
+}
+
+/* Create Request Button Styling */
+.btn-create-request {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    border: none;
+    border-radius: 16px;
+    padding: 0;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+    min-width: 280px;
+    position: relative;
+}
+
+.btn-create-request:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(59, 130, 246, 0.4);
+    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+}
+
+.btn-create-request:active {
+    transform: translateY(-1px);
+}
+
+.btn-content {
+    display: flex;
+    align-items: center;
+    padding: 20px 24px;
+    color: white;
+    text-decoration: none;
+}
+
+.btn-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 16px;
+    transition: all 0.3s ease;
+}
+
+.btn-create-request:hover .btn-icon {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+.btn-icon i {
+    font-size: 20px;
+    color: white;
+}
+
+.btn-text {
+    text-align: left;
+}
+
+.btn-title {
+    display: block;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.btn-subtitle {
+    display: block;
+    font-size: 12px;
+    opacity: 0.8;
+    font-weight: 400;
+}
+
+/* Animation classes */
+.animate-fade-in {
+    animation: fadeIn 0.6s ease-out;
+}
+
+.animate-delay-1 {
+    animation-delay: 0.1s;
+}
+
+.animate-delay-2 {
+    animation-delay: 0.2s;
+}
+
+.animate-delay-3 {
+    animation-delay: 0.3s;
+}
+
+.animate-delay-4 {
+    animation-delay: 0.4s;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
     }
-    
-    .btn-group .btn {
-        margin-right: 0;
-        margin-bottom: 2px;
-    }
-    
-    .table-responsive {
-        font-size: 0.875rem;
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 </style>
 
 <script>
+function refreshPage() {
+    window.location.reload();
+}
+
 function applyFilters() {
     const status = document.getElementById('statusFilter').value;
     const supplier = document.getElementById('supplierFilter').value;
@@ -501,38 +623,24 @@ function applyFilters() {
     
     let url = new URL(window.location);
     if (status) url.searchParams.set('status', status);
-    else url.searchParams.delete('status');
-    
     if (supplier) url.searchParams.set('supplier', supplier);
-    else url.searchParams.delete('supplier');
-    
     if (product) url.searchParams.set('product', product);
-    else url.searchParams.delete('product');
     
     window.location.href = url.toString();
 }
 
 function approveRequest(requestId) {
-    document.getElementById('modalTitle').textContent = 'Approve Stock Request';
-    document.getElementById('requestId').value = requestId;
-    document.getElementById('actionType').value = 'approve';
-    document.getElementById('adminNotes').placeholder = 'Add any notes about this approval...';
-    document.getElementById('submitBtn').textContent = 'Approve';
-    document.getElementById('submitBtn').className = 'btn btn-success';
-    
-    new bootstrap.Modal(document.getElementById('approvalModal')).show();
+    const modal = new bootstrap.Modal(document.getElementById('approvalModal'));
+    const form = document.getElementById('approvalForm');
+    form.action = `/stock-requests/${requestId}/approve`;
+    modal.show();
 }
 
 function rejectRequest(requestId) {
-    document.getElementById('modalTitle').textContent = 'Reject Stock Request';
-    document.getElementById('requestId').value = requestId;
-    document.getElementById('actionType').value = 'reject';
-    document.getElementById('adminNotes').placeholder = 'Please provide a reason for rejection...';
-    document.getElementById('adminNotes').required = true;
-    document.getElementById('submitBtn').textContent = 'Reject';
-    document.getElementById('submitBtn').className = 'btn btn-danger';
-    
-    new bootstrap.Modal(document.getElementById('approvalModal')).show();
+    const modal = new bootstrap.Modal(document.getElementById('rejectionModal'));
+    const form = document.getElementById('rejectionForm');
+    form.action = `/stock-requests/${requestId}/reject`;
+    modal.show();
 }
 
 function completeRequest(requestId) {
@@ -541,13 +649,13 @@ function completeRequest(requestId) {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                'Content-Type': 'application/json'
-            }
+                'Content-Type': 'application/json',
+            },
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                location.reload();
+                window.location.reload();
             } else {
                 alert('Error completing request: ' + data.message);
             }
@@ -559,45 +667,9 @@ function completeRequest(requestId) {
     }
 }
 
-document.getElementById('approvalForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const requestId = document.getElementById('requestId').value;
-    const actionType = document.getElementById('actionType').value;
-    const adminNotes = document.getElementById('adminNotes').value;
-    
-    const url = actionType === 'approve' 
-        ? `/stock-requests/${requestId}/approve`
-        : `/stock-requests/${requestId}/reject`;
-    
-    fetch(url, {
-        method: 'POST',
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            admin_notes: adminNotes
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            location.reload();
-        } else {
-            alert('Error processing request: ' + data.message);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Error processing request');
-    });
-});
-
 // Set filter values from URL parameters
 document.addEventListener('DOMContentLoaded', function() {
     const urlParams = new URLSearchParams(window.location.search);
-    
     if (urlParams.get('status')) {
         document.getElementById('statusFilter').value = urlParams.get('status');
     }

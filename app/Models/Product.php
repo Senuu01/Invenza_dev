@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Product extends Model
 {
@@ -12,60 +13,73 @@ class Product extends Model
     protected $fillable = [
         'name',
         'sku',
-        'description', 
+        'description',
         'price',
         'quantity',
-        'stock',
-        'status',
-        'supplier_id',
         'category_id',
+        'supplier_id',
+        'image',
+        'status',
         'low_stock_threshold',
-        'brand',
-        'model',
         'weight',
         'dimensions'
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
-        'quantity' => 'integer',
-        'stock' => 'integer',
-        'low_stock_threshold' => 'integer',
-        'weight' => 'decimal:2'
+        'dimensions' => 'array',
     ];
 
-    /**
-     * Get the supplier that owns the product.
-     */
-    public function supplier()
-    {
-        return $this->belongsTo(Supplier::class);
-    }
-
-    /**
-     * Get the category that owns the product.
-     */
     public function category()
     {
         return $this->belongsTo(Category::class);
     }
 
-    /**
-     * Get the status label attribute.
-     */
-    public function getStatusLabelAttribute()
+    public function supplier()
     {
-        return match($this->status) {
-            'in_stock' => 'In Stock',
-            'low_stock' => 'Low Stock',
-            'out_of_stock' => 'Out of Stock',
-            default => 'Unknown'
-        };
+        return $this->belongsTo(Supplier::class);
     }
 
-    /**
-     * Get the status color attribute for UI.
-     */
+    public function cartItems()
+    {
+        return $this->hasMany(CartItem::class);
+    }
+
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
+    public function getTotalAttribute()
+    {
+        return $this->price * $this->quantity;
+    }
+
+    public function getImageUrlAttribute()
+    {
+        if ($this->image) {
+            // Check if it's a web URL
+            if (Str::startsWith($this->image, 'http')) {
+                return $this->image; // Return web URL directly
+            } else {
+                return asset('storage/' . $this->image); // Return local file URL
+            }
+        }
+        
+        // Fallback to random web image
+        return "https://picsum.photos/400/400?random=" . ($this->id ?? rand(1, 1000));
+    }
+
+    public function getIsLowStockAttribute()
+    {
+        return $this->quantity <= $this->low_stock_threshold;
+    }
+
+    public function getIsOutOfStockAttribute()
+    {
+        return $this->quantity <= 0;
+    }
+
     public function getStatusColorAttribute()
     {
         return match($this->status) {
@@ -74,21 +88,5 @@ class Product extends Model
             'out_of_stock' => 'danger',
             default => 'secondary'
         };
-    }
-
-    /**
-     * Check if product is low stock based on threshold.
-     */
-    public function isLowStock(): bool
-    {
-        return $this->quantity <= ($this->low_stock_threshold ?? 10);
-    }
-
-    /**
-     * Check if product is out of stock.
-     */
-    public function isOutOfStock(): bool
-    {
-        return $this->quantity == 0;
     }
 }
