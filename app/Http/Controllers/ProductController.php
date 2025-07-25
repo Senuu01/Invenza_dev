@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Supplier;
 use App\Models\User;
 use App\Notifications\StockUpdateNotification;
+use App\Notifications\LowStockNotification;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use Illuminate\Http\Request;
@@ -177,6 +178,28 @@ class ProductController extends Controller
         return redirect()->back()->with('success', 'Stock updated successfully.');
     }
 
+    public function getFeaturedProducts()
+    {
+        $featuredProducts = Product::with('category')
+            ->where('status', 'in_stock')
+            ->where('quantity', '>', 0)
+            ->inRandomOrder()
+            ->limit(5)
+            ->get()
+            ->map(function ($product) {
+                return [
+                    'name' => $product->name,
+                    'price' => '$' . number_format($product->price, 2),
+                    'image' => $product->image_url,
+                    'category' => $product->category ? $product->category->name : 'Uncategorized'
+                ];
+            });
+
+        return response()->json([
+            'products' => $featuredProducts
+        ]);
+    }
+
     /**
      * Send stock update notification to all admin users
      */
@@ -185,9 +208,43 @@ class ProductController extends Controller
         $adminUsers = User::where('role', 'admin')->get();
         $staffUser = auth()->user();
         
-        foreach ($adminUsers as $admin) {
-            $admin->notify(new StockUpdateNotification($product, $staffUser, $oldQuantity, $newQuantity));
+        // Check if this is a low stock situation (10 or less units)
+        if ($newQuantity <= 10) {
+            // Send low stock alert to admins only
+            foreach ($adminUsers as $admin) {
+                $admin->notify(new LowStockNotification($product, $staffUser, $newQuantity));
+            }
+        } else {
+            // Send regular stock update notification to admins only
+            foreach ($adminUsers as $admin) {
+                $admin->notify(new StockUpdateNotification($product, $staffUser, $oldQuantity, $newQuantity));
+            }
         }
+    }
+
+    /**
+     * Staff member reports low stock to admin
+     */
+    public function reportLowStock(Product $product)
+    {
+        $staffUser = auth()->user();
+        
+        // Only staff members can report low stock
+        if (!$staffUser->isStaff()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+        
+        // Send notification to all admin users
+        $adminUsers = User::where('role', 'admin')->get();
+        
+        foreach ($adminUsers as $admin) {
+            $admin->notify(new LowStockNotification($product, $staffUser, $product->quantity));
+        }
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Low stock report sent to administrators'
+        ]);
     }
 
     public function destroy(Product $product)
