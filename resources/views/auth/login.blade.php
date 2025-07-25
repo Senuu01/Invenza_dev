@@ -121,16 +121,9 @@
             margin-bottom: 40px;
         }
         
-        .logo {
-            width: 80px;
-            height: 80px;
-            background: white;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
+        .brand-logo {
+            display: inline-block;
             margin-bottom: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             animation: logoFloat 3s ease-in-out infinite;
         }
         
@@ -139,9 +132,35 @@
             50% { transform: translateY(-10px); }
         }
         
-        .logo i {
-            font-size: 32px;
-            color: #3b82f6;
+        .brand-name {
+            font-size: 48px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+            letter-spacing: -2px;
+            margin: 0;
+            position: relative;
+        }
+        
+        .brand-name::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+            border-radius: 2px;
+            animation: shimmer 2s ease-in-out infinite;
+        }
+        
+        @keyframes shimmer {
+            0%, 100% { opacity: 0.4; transform: translateX(-50%) scaleX(0.8); }
+            50% { opacity: 1; transform: translateX(-50%) scaleX(1.2); }
         }
         
         .logo-title {
@@ -610,10 +629,9 @@
     <div class="login-container">
         <!-- Logo Section -->
         <div class="logo-section">
-            <div class="logo">
-                <i class="fas fa-cube"></i>
+            <div class="brand-logo">
+                <h1 class="brand-name">Invenza</h1>
             </div>
-            <h1 class="logo-title">Invenza</h1>
             <p class="logo-subtitle">Welcome back to your dashboard</p>
         </div>
 
