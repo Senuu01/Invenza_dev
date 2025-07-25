@@ -1,29 +1,383 @@
 @extends('layouts.app')
 
-@section('header')
-    <div class="flex items-center justify-between">
-        <div>
-            <h1 class="text-2xl font-bold text-gray-900">User Management</h1>
-            <p class="text-gray-600">Manage system users and their permissions</p>
-        </div>
-        <div class="flex space-x-3">
-            <button onclick="refreshPage()" class="inline-flex items-center px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-lg hover:bg-gray-700 transition-colors">
-                <i class="fas fa-sync-alt mr-2"></i>
+@section('header', 'User Management')
+
+<style>
+/* Modern User Management Styles */
+.user-management-container {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    min-height: 100vh;
+    padding: 24px;
+}
+
+.page-header-section {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e2e8f0;
+}
+
+.page-title {
+    font-size: 28px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+}
+
+.page-subtitle {
+    color: #64748b;
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 24px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.modern-btn {
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+}
+
+.btn-primary-modern {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn-primary-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+    color: white;
+}
+
+.btn-secondary-modern {
+    background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(100, 116, 139, 0.3);
+}
+
+.btn-secondary-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(100, 116, 139, 0.4);
+    color: white;
+}
+
+/* Search Section */
+.search-section {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e2e8f0;
+}
+
+.search-container {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.search-input-wrapper {
+    flex: 1;
+    min-width: 300px;
+    position: relative;
+}
+
+.search-input {
+    width: 100%;
+    padding: 16px 20px 16px 48px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    background: #f8fafc;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+.search-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+    font-size: 18px;
+}
+
+/* Table Styles */
+.users-table-container {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e2e8f0;
+}
+
+.table-header {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    padding: 20px 24px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.table-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.table-title i {
+    color: #3b82f6;
+    font-size: 18px;
+}
+
+.modern-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.modern-table thead {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+.modern-table th {
+    padding: 16px 24px;
+    text-align: left;
+    font-weight: 600;
+    color: #475569;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.modern-table td {
+    padding: 20px 24px;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+
+.modern-table tbody tr {
+    transition: all 0.3s ease;
+}
+
+.modern-table tbody tr:hover {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* User Avatar */
+.user-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+    color: white;
+    margin-right: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.user-name {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 15px;
+}
+
+.user-created {
+    font-size: 12px;
+    color: #64748b;
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-active {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.status-inactive {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+}
+
+/* Role Badges */
+.role-badge {
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.role-admin {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.role-staff {
+    background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(100, 116, 139, 0.3);
+}
+
+/* Action Buttons */
+.action-buttons-cell {
+    display: flex;
+    gap: 8px;
+}
+
+.action-btn {
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+}
+
+.btn-edit {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    color: white;
+}
+
+.btn-edit:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.btn-delete {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+}
+
+.btn-delete:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .user-management-container {
+        padding: 16px;
+    }
+    
+    .page-header-section {
+        padding: 20px;
+    }
+    
+    .page-title {
+        font-size: 24px;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .modern-btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .search-container {
+        flex-direction: column;
+    }
+    
+    .search-input-wrapper {
+        min-width: auto;
+        width: 100%;
+    }
+    
+    .modern-table {
+        font-size: 14px;
+    }
+    
+    .modern-table th,
+    .modern-table td {
+        padding: 12px 16px;
+    }
+}
+</style>
+@endsection
+
+@section('content')
+<div class="user-management-container">
+    <!-- Page Header -->
+    <div class="page-header-section">
+        <h1 class="page-title">User Management</h1>
+        <p class="page-subtitle">Manage system users and their permissions</p>
+        <div class="action-buttons">
+            <button onclick="refreshPage()" class="modern-btn btn-secondary-modern">
+                <i class="fas fa-sync-alt"></i>
                 Refresh
             </button>
-            <a href="{{ route('admin.users.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
-                <i class="fas fa-user-plus mr-2"></i>
+            <a href="{{ route('admin.users.create') }}" class="modern-btn btn-primary-modern">
+                <i class="fas fa-user-plus"></i>
                 Add User
             </a>
         </div>
     </div>
-@endsection
 
-@section('content')
-<div class="space-y-6">
     <!-- Success/Error Messages -->
     @if(session('success'))
-        <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg" id="success-message">
+        <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6" id="success-message">
             <div class="flex items-center">
                 <i class="fas fa-check-circle mr-2"></i>
                 {{ session('success') }}
@@ -32,7 +386,7 @@
     @endif
 
     @if(session('error'))
-        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg" id="error-message">
+        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6" id="error-message">
             <div class="flex items-center">
                 <i class="fas fa-exclamation-circle mr-2"></i>
                 {{ session('error') }}
@@ -40,110 +394,103 @@
         </div>
     @endif
 
-    <!-- Search and Filters -->
-    <div class="bg-white shadow-sm rounded-xl border border-gray-200">
-        <div class="p-6">
-            <form method="GET" action="{{ route('admin.users.index') }}" class="flex flex-col md:flex-row gap-4" id="search-form">
-                <div class="flex-1">
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i class="fas fa-search text-gray-400"></i>
-                        </div>
-                        <input type="text" name="search" value="{{ request('search') }}" 
-                               placeholder="Search users by name or email..." 
-                               class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                               oninput="debounceSearch()">
-                    </div>
-                </div>
-                <button type="submit" class="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors">
-                    <i class="fas fa-search mr-2"></i>
-                    Search
-                </button>
-                @if(request('search'))
-                    <a href="{{ route('admin.users.index') }}" class="px-6 py-3 bg-gray-600 text-white font-medium rounded-lg hover:bg-gray-700 transition-colors">
-                        <i class="fas fa-times mr-2"></i>
-                        Clear
-                    </a>
-                @endif
-            </form>
-        </div>
+    <!-- Search Section -->
+    <div class="search-section">
+        <form method="GET" action="{{ route('admin.users.index') }}" class="search-container" id="search-form">
+            <div class="search-input-wrapper">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" name="search" value="{{ request('search') }}" 
+                       placeholder="Search users by name or email..." 
+                       class="search-input"
+                       oninput="debounceSearch()">
+            </div>
+            <button type="submit" class="modern-btn btn-primary-modern">
+                <i class="fas fa-search"></i>
+                Search
+            </button>
+            @if(request('search'))
+                <a href="{{ route('admin.users.index') }}" class="modern-btn btn-secondary-modern">
+                    <i class="fas fa-times"></i>
+                    Clear
+                </a>
+            @endif
+        </form>
     </div>
 
     <!-- Users Table -->
-    <div class="bg-white rounded-lg shadow overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-200">
-            <h3 class="text-lg font-semibold">Users ({{ $users->total() }})</h3>
+    <div class="users-table-container">
+        <div class="table-header">
+            <h3 class="table-title">
+                <i class="fas fa-users"></i>
+                Users ({{ $users->total() }})
+            </h3>
         </div>
         
         <div class="overflow-x-auto">
-            <table class="w-full">
-                <thead class="bg-gray-50 border-b border-gray-200">
+            <table class="modern-table">
+                <thead>
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Login</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        <th>User</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Last Login</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
+                <tbody>
                     @foreach($users as $user)
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <div class="w-10 h-10 rounded-full flex items-center justify-center mr-3" 
-                                    style="background-color: {{ '#' . substr(md5($user->name), 0, 6) }}">
-                                    <span class="text-white font-medium">
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="user-avatar" 
+                                    style="background: linear-gradient(135deg, {{ '#' . substr(md5($user->name), 0, 6) }} 0%, {{ '#' . substr(md5($user->name), 6, 6) }} 100%)">
+                                    <span>
                                         {{ substr($user->name, 0, 1) }}{{ substr($user->name, strpos($user->name, ' ') + 1, 1) }}
                                     </span>
                                 </div>
-                                <div>
-                                    <div class="text-sm font-medium text-gray-900">{{ $user->name }}</div>
-                                    <div class="text-xs text-gray-500">Created {{ $user->created_at->format('m/d/Y') }}</div>
+                                <div class="user-info">
+                                    <div class="user-name">{{ $user->name }}</div>
+                                    <div class="user-created">Created {{ $user->created_at->format('m/d/Y') }}</div>
                                 </div>
                             </div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td>
                             <div class="text-sm text-gray-900">{{ $user->email }}</div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td>
                             @if($user->role == 'admin')
-                                <span class="px-3 py-1 text-xs font-medium rounded-full bg-blue-600 text-white">
-                                    <i class="fas fa-shield-alt mr-1"></i> Admin
+                                <span class="role-badge role-admin">
+                                    <i class="fas fa-shield-alt"></i> Admin
                                 </span>
                             @else
-                                <span class="px-3 py-1 text-xs font-medium rounded-full bg-gray-200 text-gray-700">
-                                    <i class="fas fa-user mr-1"></i> Staff
+                                <span class="role-badge role-staff">
+                                    <i class="fas fa-user"></i> Staff
                                 </span>
                             @endif
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td>
                             @if($user->status == 'active')
-                                <span class="px-3 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
-                                    active
-                                </span>
+                                <span class="status-badge status-active">Active</span>
                             @else
-                                <span class="px-3 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">
-                                    inactive
-                                </span>
+                                <span class="status-badge status-inactive">Inactive</span>
                             @endif
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td>
                             <div class="text-sm text-gray-900">
                                 {{ $user->last_login ? $user->last_login->format('m/d/Y, g:i:s A') : 'Never' }}
                             </div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <div class="flex items-center space-x-3">
-                                <button onclick="editUser({{ $user->id }})" class="text-blue-600 hover:text-blue-900">
+                        <td>
+                            <div class="action-buttons-cell">
+                                <button onclick="editUser({{ $user->id }})" class="action-btn btn-edit">
                                     <i class="fas fa-edit"></i> Edit
                                 </button>
                                 @if($user->id !== Auth::id())
                                 <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:text-red-900" 
+                                    <button type="submit" class="action-btn btn-delete" 
                                         onclick="return confirm('Are you sure you want to delete this user?')">
                                         <i class="fas fa-trash"></i> Delete
                                     </button>
