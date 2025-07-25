@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 class CustomerController extends Controller
@@ -113,5 +114,49 @@ class CustomerController extends Controller
         
         return redirect()->route('customers.index')
             ->with('success', 'Customer deleted successfully.');
+    }
+
+    /**
+     * Display products for customer view
+     */
+    public function products()
+    {
+        $products = Product::with('category')
+            ->where('quantity', '>', 0)
+            ->paginate(12);
+        
+        return view('customer.dashboard', compact('products'));
+    }
+
+    /**
+     * Show a specific product for customer view
+     */
+    public function showProduct(Product $product)
+    {
+        $relatedProducts = Product::with('category')
+            ->where('category_id', $product->category_id)
+            ->where('id', '!=', $product->id)
+            ->where('quantity', '>', 0)
+            ->take(4)
+            ->get();
+        
+        return view('customer.product-detail', compact('product', 'relatedProducts'));
+    }
+
+    /**
+     * Display customer orders
+     */
+    public function orders()
+    {
+        // This would be implemented when we have order functionality
+        return view('customer.orders.index');
+    }
+
+    /**
+     * Display customer profile
+     */
+    public function profile()
+    {
+        return view('customer.profile');
     }
 }
