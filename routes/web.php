@@ -49,12 +49,29 @@ Route::fallback(function (Request $request) {
 Route::get('/debug/categories', function() {
     return [
         'auth_check' => auth()->check(),
-        'user' => auth()->user() ? auth()->user()->only(['name', 'email', 'role']) : null,
+        'user' => auth()->user() ? auth()->user()->only(['id', 'name', 'email', 'role', 'status']) : null,
         'is_admin' => auth()->user() ? auth()->user()->isAdmin() : false,
+        'is_staff' => auth()->user() ? auth()->user()->isStaff() : false,
+        'is_customer' => auth()->user() ? auth()->user()->isCustomer() : false,
+        'is_active' => auth()->user() ? auth()->user()->isActive() : false,
         'route_exists' => route('categories.create'),
         'middleware_test' => 'passed'
     ];
 })->middleware(['auth']);
+
+// Test admin access directly
+Route::get('/debug/admin-test', function() {
+    if (!auth()->check()) {
+        return 'Not logged in';
+    }
+    
+    $user = auth()->user();
+    if (!$user->isAdmin()) {
+        return 'Not admin: role=' . $user->role;
+    }
+    
+    return 'Admin access confirmed for: ' . $user->name . ' (role: ' . $user->role . ')';
+})->middleware(['auth', 'admin']);
 
 // Authenticated routes
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -117,12 +134,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('categories/{category}', [CategoryController::class, 'show'])->name('categories.show');
     });
     
-    // Temporarily remove all middleware for testing
-    Route::get('categories/create', [CategoryController::class, 'create'])->name('categories.create');
-    Route::post('categories', [CategoryController::class, 'store'])->name('categories.store');
-    Route::get('categories/{category}/edit', [CategoryController::class, 'edit'])->name('categories.edit');
-    Route::put('categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
-    Route::delete('categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
+    // Categories admin routes - restored
+    Route::middleware(['admin'])->group(function () {
+        Route::get('categories/create', [CategoryController::class, 'create'])->name('categories.create');
+        Route::post('categories', [CategoryController::class, 'store'])->name('categories.store');
+        Route::get('categories/{category}/edit', [CategoryController::class, 'edit'])->name('categories.edit');
+        Route::put('categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
+        Route::delete('categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
+    });
     
     // Customers - Admin only
     Route::middleware(['admin'])->group(function () {
