@@ -134,6 +134,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('categories/{category}', [CategoryController::class, 'show'])->name('categories.show');
     });
     
+    // Test route for create category
+    Route::get('categories/create-test', function() {
+        return 'CREATE CATEGORY TEST PAGE - This route works! User: ' . (auth()->check() ? auth()->user()->name . ' (role: ' . auth()->user()->role . ')' : 'not logged in');
+    })->middleware(['auth', 'admin'])->name('categories.create.test');
+
+    // Simple view test
+    Route::get('categories/create-simple', function() {
+        return view('categories.create-simple');
+    })->middleware(['auth', 'admin'])->name('categories.create.simple');
+
     // Categories admin routes - restored
     Route::middleware(['admin'])->group(function () {
         Route::get('categories/create', [CategoryController::class, 'create'])->name('categories.create');
