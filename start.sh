@@ -14,22 +14,19 @@ php artisan config:clear
 # Set environment variables for Laravel from Railway's MySQL variables
 export DB_CONNECTION=mysql
 
-# Try individual MySQL variables first
-if [ -n "$MYSQLHOST" ]; then
-    export DB_HOST="$MYSQLHOST"
-fi
-if [ -n "$MYSQLPORT" ]; then
-    export DB_PORT="$MYSQLPORT"
-fi
-if [ -n "$MYSQLDATABASE" ]; then
-    export DB_DATABASE="$MYSQLDATABASE"
-fi
-if [ -n "$MYSQLUSER" ]; then
-    export DB_USERNAME="$MYSQLUSER"
-fi
-if [ -n "$MYSQLPASSWORD" ]; then
-    export DB_PASSWORD="$MYSQLPASSWORD"
-fi
+# Use Railway MySQL variables directly
+export DB_HOST="$MYSQLHOST"
+export DB_PORT="${MYSQLPORT:-3306}"
+export DB_DATABASE="$MYSQLDATABASE"
+export DB_USERNAME="$MYSQLUSER"
+export DB_PASSWORD="$MYSQLPASSWORD"
+
+echo "🔧 Setting DB variables from Railway MySQL service:"
+echo "  DB_HOST=$DB_HOST"
+echo "  DB_PORT=$DB_PORT"
+echo "  DB_DATABASE=$DB_DATABASE"
+echo "  DB_USERNAME=$DB_USERNAME"
+echo "  DB_PASSWORD=${DB_PASSWORD:+[SET]}"
 
 # Fallback: Parse MYSQL_URL if individual variables not available
 if [ -z "$DB_HOST" ] && [ -n "$MYSQL_URL" ]; then
