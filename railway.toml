@@ -1,0 +1,15 @@
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "bash start.sh"
+
+[env]
+# Connect to MySQL service variables
+MYSQLHOST = { $ref = "MySQL.MYSQLHOST" }
+MYSQLPORT = { $ref = "MySQL.MYSQLPORT" }
+MYSQLDATABASE = { $ref = "MySQL.MYSQLDATABASE" }
+MYSQLUSER = { $ref = "MySQL.MYSQLUSER" }
+MYSQLPASSWORD = { $ref = "MySQL.MYSQLPASSWORD" }
+MYSQL_URL = { $ref = "MySQL.MYSQL_URL" }
+MYSQL_PUBLIC_URL = { $ref = "MySQL.MYSQL_PUBLIC_URL" }

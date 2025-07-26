@@ -13,6 +13,8 @@ php artisan config:clear
 
 # Set environment variables for Laravel from Railway's MySQL variables
 export DB_CONNECTION=mysql
+
+# Try individual MySQL variables first
 if [ -n "$MYSQLHOST" ]; then
     export DB_HOST="$MYSQLHOST"
 fi
@@ -29,6 +31,17 @@ if [ -n "$MYSQLPASSWORD" ]; then
     export DB_PASSWORD="$MYSQLPASSWORD"
 fi
 
+# Fallback: Parse MYSQL_URL if individual variables not available
+if [ -z "$DB_HOST" ] && [ -n "$MYSQL_URL" ]; then
+    echo "🔄 Parsing MYSQL_URL for database connection details..."
+    # Extract components from mysql://user:password@host:port/database
+    export DB_HOST=$(echo "$MYSQL_URL" | sed -n 's|mysql://[^:]*:[^@]*@\([^:]*\):.*|\1|p')
+    export DB_PORT=$(echo "$MYSQL_URL" | sed -n 's|mysql://[^:]*:[^@]*@[^:]*:\([^/]*\)/.*|\1|p')
+    export DB_DATABASE=$(echo "$MYSQL_URL" | sed -n 's|mysql://[^:]*:[^@]*@[^:]*:[^/]*/\(.*\)|\1|p')
+    export DB_USERNAME=$(echo "$MYSQL_URL" | sed -n 's|mysql://\([^:]*\):.*|\1|p')
+    export DB_PASSWORD=$(echo "$MYSQL_URL" | sed -n 's|mysql://[^:]*:\([^@]*\)@.*|\1|p')
+fi
+
 # Debug environment variables after setting
 echo "🔍 Debugging database environment variables:"
 echo "DB_HOST: ${DB_HOST:-not set}"
@@ -37,6 +50,7 @@ echo "DB_DATABASE: ${DB_DATABASE:-not set}"
 echo "MYSQLDATABASE: ${MYSQLDATABASE:-not set}"
 echo "DB_USERNAME: ${DB_USERNAME:-not set}"
 echo "MYSQLUSER: ${MYSQLUSER:-not set}"
+echo "MYSQL_URL: ${MYSQL_URL:-not set}"
 echo "DATABASE_URL: ${DATABASE_URL:-not set}"
 
 # Wait for database to be ready and run migrations (with timeout)
