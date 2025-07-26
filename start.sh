@@ -34,12 +34,26 @@ fi
 # Fallback: Parse MYSQL_URL if individual variables not available
 if [ -z "$DB_HOST" ] && [ -n "$MYSQL_URL" ]; then
     echo "🔄 Parsing MYSQL_URL for database connection details..."
+    echo "MYSQL_URL: $MYSQL_URL"
+    
     # Extract components from mysql://user:password@host:port/database
-    export DB_HOST=$(echo "$MYSQL_URL" | sed -n 's|mysql://[^:]*:[^@]*@\([^:]*\):.*|\1|p')
-    export DB_PORT=$(echo "$MYSQL_URL" | sed -n 's|mysql://[^:]*:[^@]*@[^:]*:\([^/]*\)/.*|\1|p')
-    export DB_DATABASE=$(echo "$MYSQL_URL" | sed -n 's|mysql://[^:]*:[^@]*@[^:]*:[^/]*/\(.*\)|\1|p')
-    export DB_USERNAME=$(echo "$MYSQL_URL" | sed -n 's|mysql://\([^:]*\):.*|\1|p')
-    export DB_PASSWORD=$(echo "$MYSQL_URL" | sed -n 's|mysql://[^:]*:\([^@]*\)@.*|\1|p')
+    # More robust parsing with better regex
+    DB_HOST_PARSED=$(echo "$MYSQL_URL" | sed -n 's|mysql://[^:]*:[^@]*@\([^:]*\):.*|\1|p')
+    DB_PORT_PARSED=$(echo "$MYSQL_URL" | sed -n 's|mysql://[^:]*:[^@]*@[^:]*:\([^/]*\)/.*|\1|p')
+    DB_DATABASE_PARSED=$(echo "$MYSQL_URL" | sed -n 's|mysql://[^:]*:[^@]*@[^:]*:[^/]*/\([^?]*\).*|\1|p')
+    DB_USERNAME_PARSED=$(echo "$MYSQL_URL" | sed -n 's|mysql://\([^:]*\):.*|\1|p')
+    DB_PASSWORD_PARSED=$(echo "$MYSQL_URL" | sed -n 's|mysql://[^:]*:\([^@]*\)@.*|\1|p')
+    
+    if [ -n "$DB_HOST_PARSED" ]; then
+        export DB_HOST="$DB_HOST_PARSED"
+        export DB_PORT="${DB_PORT_PARSED:-3306}"
+        export DB_DATABASE="$DB_DATABASE_PARSED"
+        export DB_USERNAME="$DB_USERNAME_PARSED"
+        export DB_PASSWORD="$DB_PASSWORD_PARSED"
+        echo "✅ Successfully parsed MYSQL_URL"
+    else
+        echo "❌ Failed to parse MYSQL_URL"
+    fi
 fi
 
 # Debug environment variables after setting
