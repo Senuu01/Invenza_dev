@@ -21,7 +21,46 @@
 
 .modern-card .card-body {
     overflow: visible;
-    padding: 1.5rem;
+    padding: 2rem 1.5rem;
+}
+
+/* Statistics cards specific padding */
+.modern-card .d-flex.align-items-center {
+    padding: 0.5rem;
+}
+
+.modern-card .flex-grow-1.ms-3 {
+    margin-left: 1.5rem !important;
+    padding-right: 1rem;
+}
+
+/* Quick Actions and Recent Products cards */
+.modern-card .card-header {
+    padding: 1.5rem 1.5rem 0.5rem 1.5rem;
+}
+
+.modern-card .card-body.p-4 {
+    padding: 1.5rem !important;
+}
+
+.modern-card .card-body.p-0 {
+    padding: 0 !important;
+}
+
+/* Table padding fixes */
+.modern-table table th,
+.modern-table table td {
+    padding: 1rem 1.5rem;
+}
+
+.modern-table table th:first-child,
+.modern-table table td:first-child {
+    padding-left: 2rem;
+}
+
+.modern-table table th:last-child,
+.modern-table table td:last-child {
+    padding-right: 2rem;
 }
 
 .modern-card .flex-grow-1 {
@@ -68,10 +107,21 @@
     gap: 1rem !important;
     flex-wrap: wrap;
     margin: -0.5rem;
+    padding: 0.5rem;
 }
 
 .d-flex.flex-wrap.gap-3 > * {
     margin: 0.5rem;
+}
+
+/* Button padding improvements */
+.btn {
+    padding: 0.75rem 1.5rem !important;
+    border-radius: 8px;
+}
+
+.btn i {
+    margin-right: 0.5rem;
 }
 
 /* Row spacing fixes */
