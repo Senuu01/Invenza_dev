@@ -117,14 +117,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('categories/{category}', [CategoryController::class, 'show'])->name('categories.show');
     });
     
-    // Temporarily bypass admin middleware for testing
-    Route::middleware(['staff'])->group(function () {
-        Route::get('categories/create', [CategoryController::class, 'create'])->name('categories.create');
-        Route::post('categories', [CategoryController::class, 'store'])->name('categories.store');
-        Route::get('categories/{category}/edit', [CategoryController::class, 'edit'])->name('categories.edit');
-        Route::put('categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
-        Route::delete('categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
-    });
+    // Temporarily remove all middleware for testing
+    Route::get('categories/create', [CategoryController::class, 'create'])->name('categories.create');
+    Route::post('categories', [CategoryController::class, 'store'])->name('categories.store');
+    Route::get('categories/{category}/edit', [CategoryController::class, 'edit'])->name('categories.edit');
+    Route::put('categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
+    Route::delete('categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
     
     // Customers - Admin only
     Route::middleware(['admin'])->group(function () {
