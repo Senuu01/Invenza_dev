@@ -3,14 +3,30 @@
 @section('header', 'Admin Dashboard')
 
 <style>
+/* Fix content area scrolling and layout */
+.container-fluid {
+    max-width: 100%;
+    padding-bottom: 2rem;
+    min-height: calc(100vh - 120px);
+    overflow-y: visible;
+}
+
 /* Admin Dashboard Card Improvements */
+.modern-card {
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border: none;
+    border-radius: 12px;
+}
+
 .modern-card .card-body {
-    overflow: hidden;
+    overflow: visible;
+    padding: 1.5rem;
 }
 
 .modern-card .flex-grow-1 {
     min-width: 0;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .modern-card .fw-bold.fs-3 {
@@ -36,6 +52,41 @@
     flex-shrink: 0;
 }
 
+/* Fix table layout */
+.modern-table {
+    overflow-x: auto;
+    width: 100%;
+}
+
+.modern-table table {
+    width: 100%;
+    table-layout: auto;
+}
+
+/* Quick Actions section fixes */
+.d-flex.flex-wrap.gap-3 {
+    gap: 1rem !important;
+    flex-wrap: wrap;
+    margin: -0.5rem;
+}
+
+.d-flex.flex-wrap.gap-3 > * {
+    margin: 0.5rem;
+}
+
+/* Row spacing fixes */
+.row.mb-4 {
+    margin-bottom: 2rem !important;
+}
+
+/* Ensure content doesn't get cut off */
+.content-area {
+    padding-bottom: 3rem !important;
+    overflow-y: auto !important;
+    height: auto !important;
+    min-height: calc(100vh - 120px) !important;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .modern-card .fw-bold.fs-3 {
@@ -45,11 +96,25 @@
     .modern-card .text-muted.small {
         font-size: 0.8rem;
     }
+    
+    .container-fluid {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
 }
 
 @media (max-width: 576px) {
     .modern-card .fw-bold.fs-3 {
         font-size: 1.1rem !important;
+    }
+    
+    .d-flex.flex-wrap.gap-3 {
+        flex-direction: column;
+    }
+    
+    .d-flex.flex-wrap.gap-3 > .btn {
+        width: 100%;
+        text-align: center;
     }
 }
 </style>
