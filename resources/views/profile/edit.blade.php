@@ -211,16 +211,18 @@
                     </h6>
                 </div>
                 <div class="card-body p-4">
-                    <div class="row text-center">
-                        <div class="col-6 mb-3">
-                            <div class="border-end">
-                                <div class="fw-bold fs-4 text-primary">{{ \Carbon\Carbon::parse($user->created_at)->diffInDays() }}</div>
+                    <div class="row text-center g-3">
+                        <div class="col-12 mb-2">
+                            <div class="stats-item border-bottom pb-3">
+                                <div class="fw-bold fs-4 text-primary mb-1">{{ \Carbon\Carbon::parse($user->created_at)->diffInDays() }}</div>
                                 <div class="small text-muted">Days Active</div>
                             </div>
                         </div>
-                        <div class="col-6 mb-3">
-                            <div class="fw-bold fs-4 text-success">{{ $user->updated_at->diffForHumans() }}</div>
-                            <div class="small text-muted">Last Updated</div>
+                        <div class="col-12">
+                            <div class="stats-item">
+                                <div class="fw-bold fs-6 text-success mb-1">{{ $user->updated_at->diffForHumans() }}</div>
+                                <div class="small text-muted">Last Updated</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -405,6 +407,31 @@
 
 .modal-footer {
     border-top: 1px solid #e2e8f0;
+}
+
+/* Account Statistics Styling */
+.stats-item {
+    padding: 8px 0;
+}
+
+.stats-item .fw-bold {
+    word-wrap: break-word;
+    line-height: 1.2;
+    margin-bottom: 4px;
+}
+
+.stats-item .small {
+    font-size: 12px;
+    line-height: 1.3;
+}
+
+/* Prevent text overflow */
+.col-12 .stats-item {
+    overflow: hidden;
+}
+
+.border-bottom {
+    border-bottom: 1px solid #e2e8f0 !important;
 }
 </style>
 

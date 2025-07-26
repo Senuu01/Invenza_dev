@@ -2,6 +2,7 @@
 
 @section('header', 'User Management')
 
+@section('content')
 <style>
 /* Modern User Management Styles */
 .user-management-container {
@@ -355,9 +356,6 @@
     }
 }
 </style>
-@endsection
-
-@section('content')
 <div class="user-management-container">
     <!-- Page Header -->
     <div class="page-header-section">

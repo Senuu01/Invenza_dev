@@ -8,14 +8,25 @@ if [ ! -L "public/storage" ]; then
     echo "✅ Storage link created"
 fi
 
-# Clear all caches
+# Clear configuration cache first (important for new env vars)
 php artisan config:clear
-php artisan cache:clear
-php artisan view:clear
-php artisan route:clear
+
+# Wait for database to be ready and run migrations
+echo "⏳ Waiting for database connection..."
+until php artisan migrate:status > /dev/null 2>&1; do
+    echo "Database not ready yet, waiting 2 seconds..."
+    sleep 2
+done
+
+echo "✅ Database connection established"
 
 # Run migrations (with --force for production)
 php artisan migrate --force
+
+# Clear other caches after database is ready
+php artisan cache:clear
+php artisan view:clear
+php artisan route:clear
 
 # Cache everything for production
 php artisan config:cache
