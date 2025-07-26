@@ -13,30 +13,30 @@ php artisan config:clear
 
 # Set environment variables for Laravel from Railway's MySQL variables
 export DB_CONNECTION=mysql
-if [ -n "$MYSQL_HOST" ]; then
-    export DB_HOST="$MYSQL_HOST"
+if [ -n "$MYSQLHOST" ]; then
+    export DB_HOST="$MYSQLHOST"
 fi
-if [ -n "$MYSQL_PORT" ]; then
-    export DB_PORT="$MYSQL_PORT"
+if [ -n "$MYSQLPORT" ]; then
+    export DB_PORT="$MYSQLPORT"
 fi
-if [ -n "$MYSQL_DATABASE" ]; then
-    export DB_DATABASE="$MYSQL_DATABASE"
+if [ -n "$MYSQLDATABASE" ]; then
+    export DB_DATABASE="$MYSQLDATABASE"
 fi
-if [ -n "$MYSQL_USER" ]; then
-    export DB_USERNAME="$MYSQL_USER"
+if [ -n "$MYSQLUSER" ]; then
+    export DB_USERNAME="$MYSQLUSER"
 fi
-if [ -n "$MYSQL_PASSWORD" ]; then
-    export DB_PASSWORD="$MYSQL_PASSWORD"
+if [ -n "$MYSQLPASSWORD" ]; then
+    export DB_PASSWORD="$MYSQLPASSWORD"
 fi
 
 # Debug environment variables after setting
 echo "🔍 Debugging database environment variables:"
 echo "DB_HOST: ${DB_HOST:-not set}"
-echo "MYSQL_HOST: ${MYSQL_HOST:-not set}"
+echo "MYSQLHOST: ${MYSQLHOST:-not set}"
 echo "DB_DATABASE: ${DB_DATABASE:-not set}"
-echo "MYSQL_DATABASE: ${MYSQL_DATABASE:-not set}"
+echo "MYSQLDATABASE: ${MYSQLDATABASE:-not set}"
 echo "DB_USERNAME: ${DB_USERNAME:-not set}"
-echo "MYSQL_USER: ${MYSQL_USER:-not set}"
+echo "MYSQLUSER: ${MYSQLUSER:-not set}"
 echo "DATABASE_URL: ${DATABASE_URL:-not set}"
 
 # Wait for database to be ready and run migrations (with timeout)
