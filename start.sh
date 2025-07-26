@@ -11,7 +11,25 @@ fi
 # Clear configuration cache first (important for new env vars)
 php artisan config:clear
 
-# Debug environment variables
+# Set environment variables for Laravel from Railway's MySQL variables
+export DB_CONNECTION=mysql
+if [ -n "$MYSQL_HOST" ]; then
+    export DB_HOST="$MYSQL_HOST"
+fi
+if [ -n "$MYSQL_PORT" ]; then
+    export DB_PORT="$MYSQL_PORT"
+fi
+if [ -n "$MYSQL_DATABASE" ]; then
+    export DB_DATABASE="$MYSQL_DATABASE"
+fi
+if [ -n "$MYSQL_USER" ]; then
+    export DB_USERNAME="$MYSQL_USER"
+fi
+if [ -n "$MYSQL_PASSWORD" ]; then
+    export DB_PASSWORD="$MYSQL_PASSWORD"
+fi
+
+# Debug environment variables after setting
 echo "🔍 Debugging database environment variables:"
 echo "DB_HOST: ${DB_HOST:-not set}"
 echo "MYSQL_HOST: ${MYSQL_HOST:-not set}"
