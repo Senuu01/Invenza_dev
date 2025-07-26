@@ -56,14 +56,37 @@ if [ -z "$DB_HOST" ] && [ -n "$MYSQL_URL" ]; then
     fi
 fi
 
+# Final fallback: Use known Railway MySQL details if still no connection
+if [ -z "$DB_HOST" ]; then
+    echo "🔄 Using Railway MySQL fallback configuration..."
+    export DB_HOST="mainline.proxy.rlwy.net"
+    export DB_PORT="3306"
+    export DB_DATABASE="railway"
+    export DB_USERNAME="root"
+    # Check for any password-related environment variables
+    if [ -n "$MYSQL_ROOT_PASSWORD" ]; then
+        export DB_PASSWORD="$MYSQL_ROOT_PASSWORD"
+    elif [ -n "$PASSWORD" ]; then
+        export DB_PASSWORD="$PASSWORD"
+    elif [ -n "$ROOT_PASSWORD" ]; then
+        export DB_PASSWORD="$ROOT_PASSWORD"
+    else
+        echo "⚠️ No password found in environment variables"
+    fi
+    echo "✅ Railway fallback configuration set"
+fi
+
 # Debug environment variables after setting
 echo "🔍 Debugging database environment variables:"
 echo "DB_HOST: ${DB_HOST:-not set}"
-echo "MYSQLHOST: ${MYSQLHOST:-not set}"
+echo "DB_PORT: ${DB_PORT:-not set}"
 echo "DB_DATABASE: ${DB_DATABASE:-not set}"
-echo "MYSQLDATABASE: ${MYSQLDATABASE:-not set}"
 echo "DB_USERNAME: ${DB_USERNAME:-not set}"
+echo "DB_PASSWORD: ${DB_PASSWORD:+[SET]}"
+echo "MYSQLHOST: ${MYSQLHOST:-not set}"
+echo "MYSQLDATABASE: ${MYSQLDATABASE:-not set}"
 echo "MYSQLUSER: ${MYSQLUSER:-not set}"
+echo "MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:+[SET]}"
 echo "MYSQL_URL: ${MYSQL_URL:-not set}"
 echo "DATABASE_URL: ${DATABASE_URL:-not set}"
 
