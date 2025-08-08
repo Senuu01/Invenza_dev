@@ -113,7 +113,7 @@
                                         <i class="fas fa-times me-2"></i>
                                         Cancel
                                     </a>
-                                    <button type="submit" class="btn btn-primary-modern">
+                                    <button type="submit" class="btn btn-primary-modern" id="createBtn">
                                         <i class="fas fa-save me-2"></i>
                                         Create Category
                                     </button>
@@ -184,6 +184,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const namePreview = document.getElementById('namePreview');
     const colorPreview = document.getElementById('colorPreview');
     const iconPreview = document.getElementById('iconPreview');
+    const form = document.querySelector('form');
+    const createBtn = document.getElementById('createBtn');
 
     // Update preview when inputs change
     nameInput.addEventListener('input', function() {
@@ -197,6 +199,21 @@ document.addEventListener('DOMContentLoaded', function() {
     iconInput.addEventListener('input', function() {
         const iconClasses = this.value || 'fas fa-tag';
         iconPreview.className = iconClasses + ' text-white';
+    });
+
+    // Add form submission handler for debugging
+    form.addEventListener('submit', function(e) {
+        console.log('Form submission started');
+        createBtn.disabled = true;
+        createBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating...';
+    });
+
+    // Add error handling for form validation
+    const inputs = form.querySelectorAll('input[required]');
+    inputs.forEach(input => {
+        input.addEventListener('invalid', function(e) {
+            console.log('Validation error on field:', this.name, 'Error:', this.validationMessage);
+        });
     });
 });
 </script>

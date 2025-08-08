@@ -40,17 +40,28 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:categories,name',
-            'description' => 'nullable|string',
-            'color' => 'required|string|max:7',
-            'icon' => 'nullable|string|max:50',
-        ]);
-        
-        Category::create($validated);
-        
-        return redirect()->route('categories.index')
-            ->with('success', 'Category created successfully.');
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255|unique:categories,name',
+                'description' => 'nullable|string',
+                'color' => 'required|string|max:7',
+                'icon' => 'nullable|string|max:50',
+            ]);
+            
+            $category = Category::create($validated);
+            
+            return redirect()->route('categories.index')
+                ->with('success', 'Category "' . $category->name . '" created successfully.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()
+                ->withErrors($e->validator)
+                ->withInput();
+        } catch (\Exception $e) {
+            \Log::error('Category creation failed: ' . $e->getMessage());
+            return redirect()->back()
+                ->with('error', 'Failed to create category. Please try again.')
+                ->withInput();
+        }
     }
 
     /**

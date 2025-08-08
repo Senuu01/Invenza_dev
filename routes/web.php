@@ -131,6 +131,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Categories - Staff can view, Admin can manage
     Route::middleware(['staff'])->group(function () {
         Route::get('categories', [CategoryController::class, 'index'])->name('categories.index');
+    });
+    
+    // Categories admin routes - must be before {category} route to avoid conflicts
+    Route::middleware(['admin'])->group(function () {
+        Route::get('categories/create', [CategoryController::class, 'create'])->name('categories.create');
+        Route::post('categories', [CategoryController::class, 'store'])->name('categories.store');
+        Route::get('categories/{category}/edit', [CategoryController::class, 'edit'])->name('categories.edit');
+        Route::put('categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
+        Route::delete('categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
+    });
+    
+    // Categories show route - must be after create route to avoid conflicts
+    Route::middleware(['staff'])->group(function () {
         Route::get('categories/{category}', [CategoryController::class, 'show'])->name('categories.show');
     });
     
@@ -143,15 +156,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('categories/create-simple', function() {
         return view('categories.create-simple');
     })->middleware(['auth', 'admin'])->name('categories.create.simple');
-
-    // Categories admin routes - restored
-    Route::middleware(['admin'])->group(function () {
-        Route::get('categories/create', [CategoryController::class, 'create'])->name('categories.create');
-        Route::post('categories', [CategoryController::class, 'store'])->name('categories.store');
-        Route::get('categories/{category}/edit', [CategoryController::class, 'edit'])->name('categories.edit');
-        Route::put('categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
-        Route::delete('categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
-    });
     
     // Customers - Admin only
     Route::middleware(['admin'])->group(function () {
